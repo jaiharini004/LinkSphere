@@ -139,6 +139,45 @@ def trigger_n8n_webhook(link):
         print(f"[LinkSphere] Optional n8n webhook notification skipped: {e}")
 
 
+def send_invitation_email(email, team=None, role=None, inviter=None):
+    """
+    Sends an invitation email webhook to n8n with the configured secret token.
+    """
+    import requests
+    webhook_url = os.getenv("N8N_INVITE_WEBHOOK_URL")
+    token = os.getenv("N8N_INVITE_TOKEN")
+
+    if not webhook_url:
+        print("[LinkSphere] N8N_INVITE_WEBHOOK_URL is not set.")
+        return None
+
+    payload = {"email": email}
+    if team:
+        payload["team_name"] = team.name if hasattr(team, 'name') else str(team)
+        if hasattr(team, 'id'):
+            payload["team_id"] = team.id
+    if role:
+        payload["role"] = str(role)
+    if inviter:
+        payload["inviter_name"] = inviter.name if hasattr(inviter, 'name') else str(inviter)
+        if hasattr(inviter, 'email'):
+            payload["inviter_email"] = inviter.email
+
+    headers = {}
+    if token:
+        headers["X-Invite-Token"] = token
+
+    response = requests.post(
+        webhook_url,
+        json=payload,
+        headers=headers,
+        timeout=10
+    )
+
+    response.raise_for_status()
+    return response
+
+
 def verify_link_health(link):
     """
     Checks the HTTP status and availability of a link's destination URL.

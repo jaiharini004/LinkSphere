@@ -746,11 +746,26 @@ def add_team_member(team_id):
 
     data = request.get_json(silent=True) or request.form
     email = (data.get('email') or '').strip()
+    role = (data.get('role') or 'Member').strip()
 
     if not email:
         return jsonify({'error': 'Please provide an email address.'}), 400
 
-    return jsonify({'status': 'ok', 'message': f'Invitation sent to {email}'})
+    from app.helpers import send_invitation_email
+    webhook_sent = False
+    try:
+        send_invitation_email(email, team=team, role=role, inviter=user)
+        webhook_sent = True
+    except Exception as e:
+        print(f"[LinkSphere] n8n invite webhook notification notice: {e}")
+
+    return jsonify({
+        'status': 'ok',
+        'message': f'Invitation sent to {email}',
+        'email': email,
+        'role': role,
+        'webhook_sent': webhook_sent
+    })
 
 
 @user_bp.route('/settings')

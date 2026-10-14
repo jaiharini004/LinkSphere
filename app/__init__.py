@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, jsonify
 from app.config import Config
 from app.extensions import db
 from app.models import User, Category, Link, Team
-from app.helpers import get_current_user, compute_user_metrics
+from app.helpers import get_current_user, compute_user_metrics, send_invitation_email
 from app.routes.auth import auth_bp
 from app.routes.user import user_bp
 from app.routes.short import short_bp

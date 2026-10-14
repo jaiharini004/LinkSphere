@@ -345,11 +345,39 @@ def run_tests():
         assert checked_count >= 1
         print("Test 19 Passed: Automatic & manual link health checking verified.")
 
+        # 20. n8n Team Invitation Webhook
+        from unittest.mock import patch, MagicMock
+        from app.helpers import send_invitation_email
+
+        with patch('requests.post') as mock_post:
+            mock_resp = MagicMock()
+            mock_resp.status_code = 200
+            mock_resp.raise_for_status.return_value = None
+            mock_post.return_value = mock_resp
+
+            # Direct function test
+            res_obj = send_invitation_email("partner@example.com")
+            assert mock_post.called
+            args, kwargs = mock_post.call_args
+            assert kwargs['json'] == {'email': 'partner@example.com'}
+            assert 'X-Invite-Token' in kwargs['headers']
+
+            # API route test: rahul invites partner to rahul_team
+            res = client.post(f'/teams/{rahul_team.id}/members', json={
+                'email': 'teammate@example.com',
+                'role': 'Member'
+            })
+            assert res.status_code == 200
+            assert res.get_json()['status'] == 'ok'
+            assert res.get_json()['webhook_sent'] is True
+        print("Test 20 Passed: n8n team member invitation webhook integration verified.")
+
         print("\n===========================================")
-        print("ALL 19 VERIFICATION SUITES PASSED FLAWLESSLY!")
+        print("ALL 20 VERIFICATION SUITES PASSED FLAWLESSLY!")
         print("===========================================")
 
 if __name__ == '__main__':
     run_tests()
+
 
 

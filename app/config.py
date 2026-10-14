@@ -20,3 +20,7 @@ class Config:
         print("[LinkSphere] No Supabase DATABASE_URL configured. Falling back to local SQLite: sqlite:///linksphere.db")
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # n8n Automation Webhooks
+    N8N_INVITE_WEBHOOK_URL = os.getenv('N8N_INVITE_WEBHOOK_URL', '').strip()
+    N8N_INVITE_TOKEN = os.getenv('N8N_INVITE_TOKEN', '').strip()
