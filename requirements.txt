@@ -3,3 +3,6 @@ Flask-SQLAlchemy
 psycopg[binary]
 python-dotenv
 requests
+gunicorn
+python-dotenv
+psycopg2-binary
