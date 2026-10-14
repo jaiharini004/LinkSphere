@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% set is_admin = True %}
+{% set active_page = 'adminOverview' %}
+
+{% block title %}Admin Dashboard - LinkSphere{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+{% block page_subtitle %}Platform overview and system health metrics{% endblock %}
+
+{% block content %}
+<!-- 7 Platform Overview Metric Cards -->
+<div class="metric-grid" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
+  <button type="button" class="metric-card admin-metric" data-action="goto" data-view="adminUsers" data-filter="all">
+    <div class="metric-label">Total Users</div>
+    <div class="metric-value">{{ admin_metrics.users | default(0) }}</div>
+  </button>
+  <button type="button" class="metric-card admin-metric" data-action="goto" data-view="adminUsers" data-filter="active">
+    <div class="metric-label">Active Users</div>
+    <div class="metric-value">{{ admin_metrics.activeUsers | default(0) }}</div>
+  </button>
+  <button type="button" class="metric-card admin-metric" data-action="goto" data-view="adminUsers" data-filter="disabled">
+    <div class="metric-label">Disabled Users</div>
+    <div class="metric-value">{{ admin_metrics.disabledUsers | default(0) }}</div>
+  </button>
+  <button type="button" class="metric-card admin-metric" data-action="goto" data-view="adminTeams">
+    <div class="metric-label">Total Teams</div>
+    <div class="metric-value">{{ admin_metrics.teams | default(0) }}</div>
+  </button>
+  <button type="button" class="metric-card admin-metric" data-action="goto" data-view="adminTeams">
+    <div class="metric-label">Total Active Links</div>
+    <div class="metric-value">{{ admin_metrics.activeLinks | default(0) }}</div>
+  </button>
+  <button type="button" class="metric-card admin-metric type-healthy" data-action="goto" data-view="adminTeams">
+    <div class="metric-label">Healthy Links</div>
+    <div class="metric-value">{{ admin_metrics.healthy | default(0) }}</div>
+  </button>
+  <button type="button" class="metric-card admin-metric type-unhealthy" data-action="goto" data-view="adminTeams">
+    <div class="metric-label">Unhealthy Links</div>
+    <div class="metric-value">{{ admin_metrics.unhealthy | default(0) }}</div>
+  </button>
+</div>
+
+<!-- Health Donut & Platform Activity -->
+<div class="grid-2">
+  <section class="glass-panel">
+    <h2 class="panel-title">Platform link health</h2>
+    <div class="donut-wrap">
+      <svg class="donut" viewBox="0 0 42 42" role="img" aria-label="Platform Link Health">
+        <circle cx="21" cy="21" r="15.9155" stroke="var(--accent-soft)"/>
+        <circle class="stroke-healthy" cx="21" cy="21" r="15.9155" stroke-dasharray="75 25" stroke-dashoffset="25"/>
+        <circle class="stroke-unhealthy" cx="21" cy="21" r="15.9155" stroke-dasharray="12 88" stroke-dashoffset="50"/>
+        <circle class="stroke-restricted" cx="21" cy="21" r="15.9155" stroke-dasharray="13 87" stroke-dashoffset="38"/>
+        <text x="21" y="21.5" text-anchor="middle" font-size="9">{{ admin_metrics.activeLinks | default(0) }}</text>
+        <text x="21" y="27" text-anchor="middle" font-size="3.6" style="font-weight:600">links</text>
+      </svg>
+      <div class="legend">
+        <div class="legend-row"><span class="swatch sw-healthy"></span>Healthy<b>{{ admin_metrics.healthy | default(0) }}</b></div>
+        <div class="legend-row"><span class="swatch sw-unhealthy"></span>Unhealthy<b>{{ admin_metrics.unhealthy | default(0) }}</b></div>
+        <div class="legend-row"><span class="swatch sw-restricted"></span>Restricted<b>{{ admin_metrics.restricted | default(0) }}</b></div>
+        <div class="legend-row"><span class="swatch sw-notverified"></span>Not Verified<b>{{ admin_metrics.notverified | default(0) }}</b></div>
+      </div>
+    </div>
+    <p class="card-meta" style="margin-top:12px">Restricted and Not Verified are monitored states, not system failures.</p>
+  </section>
+
+  <section class="glass-panel">
+    <div class="panel-title-row">
+      <h2 class="panel-title">Platform Activity Log</h2>
+      <span class="sim-label">Activity</span>
+    </div>
+    <div class="activity-feed">
+      {% if platform_activity %}
+        {% for act in platform_activity %}
+          <div class="activity-feed-item">
+            <div class="activity-feed-icon">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+            </div>
+            <div class="activity-feed-body">
+              <div class="activity-feed-desc">{{ act.desc }}</div>
+              <div class="activity-feed-time">{{ act.time_label | default('Recent') }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="card-meta" style="padding: var(--space-4) 0;">No platform activity recorded yet.</p>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

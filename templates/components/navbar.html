@@ -1,0 +1,39 @@
+<!-- Top Bar Component -->
+<header class="topbar">
+  <div class="top-left">
+    <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" data-action="toggleMobileMenu" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+    </button>
+    <a href="{{ url_for('admin_dashboard') if is_admin else url_for('dashboard') }}" class="logo" id="topLogo" style="text-decoration:none;color:inherit;">
+      <svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="20" cy="20" r="15"/><ellipse cx="20" cy="20" rx="15" ry="6"/><path d="M20 5v30"/></svg>
+      <span>LinkSphere</span>
+      {% if is_admin %}
+        <span class="logo-sub">Admin</span>
+      {% endif %}
+    </a>
+  </div>
+
+  <div class="top-right">
+    <!-- Theme Toggle -->
+    <button class="icon-btn" id="themeBtn" type="button" data-action="toggleTheme" aria-label="Switch light / dark theme" title="Light / dark theme">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>
+    </button>
+
+    {% if current_user %}
+      <!-- User Profile Chip -->
+      <div class="profile-chip">
+        <span class="avatar" id="avatar">{{ current_user.name[0] if current_user.name else 'U' }}</span>
+        <span class="name" id="profileName">{{ current_user.name if current_user.name else 'User' }}</span>
+      </div>
+
+      <!-- Sign Out Button -->
+      <form method="POST" action="{{ url_for('logout') }}" style="display:inline;margin:0;">
+        <button class="btn" type="submit" data-action="signOut">Sign Out</button>
+      </form>
+    {% else %}
+      <a href="{{ url_for('user_login') }}" class="btn btn-primary" style="text-decoration:none;">Sign In</a>
+    {% endif %}
+  </div>
+</header>

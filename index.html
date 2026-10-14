@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LinkSphere - Save, organise, share and monitor links</title>
+  <!-- Optional font. If you are offline the browser simply uses the fallback fonts from styles.css -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- =====================================================================
+     MAIN GLASS CONTAINER
+     Everything lives inside this big rounded translucent panel.
+     It contains two areas: #authArea (login screens) and #appArea (dashboards).
+     Nearly all content is created by script.js, so this file stays short.
+     ===================================================================== -->
+  <div class="app-shell">
+    <div class="app-shell-inner">
+
+      <!-- ================= AUTHENTICATION AREA (simulated, no real security) ================= -->
+      <section id="authArea" class="auth-area">
+
+        <!-- USER LOGIN / LANDING SCREEN -->
+        <div id="screen-user-login" class="landing-screen">
+          <!-- Landing Page Navigation Header -->
+          <header class="landing-header">
+            <div class="logo" id="authLogo1"></div>
+            <nav class="landing-nav" id="landingNav" aria-label="Landing navigation">
+              <a class="landing-nav-item active" href="#homeSection" data-action="scrollSection" data-target="homeSection">Home</a>
+              <a class="landing-nav-item" href="#aboutSection" data-action="scrollSection" data-target="aboutSection">About</a>
+              <a class="landing-nav-item" href="#shortUrlSection" data-action="scrollSection" data-target="shortUrlSection">Short URL</a>
+              <button class="btn btn-sm btn-primary nav-signin-btn" type="button" data-action="openSignInModal" id="navSignInBtn">Sign In</button>
+              <button class="icon-btn" id="landingThemeBtn" type="button" data-action="toggleTheme"
+                aria-label="Switch light / dark theme" title="Light / dark theme"></button>
+              <button class="link-btn" type="button" data-action="goAuth" data-screen="admin-login"
+                style="font-size:12px;opacity:0.85;">Admin Login</button>
+            </nav>
+          </header>
+
+          <!-- Home / Hero Section -->
+          <section class="landing-hero" id="homeSection">
+            <h1 class="landing-title">Welcome to LinkSphere</h1>
+            <p class="landing-sub">Save, organise, share and monitor your links in one centralised workspace.</p>
+          </section>
+
+          <!-- About Section -->
+          <section class="landing-section glass-panel" id="aboutSection">
+            <h2 class="section-title">About LinkSphere</h2>
+            <p class="section-desc">
+              LinkSphere helps you organise, manage, and share your web links in one centralised workspace. Create shorter, shareable URLs from long web addresses and manage your saved links more easily.
+            </p>
+            <p class="section-subdesc">
+              With LinkSphere short URLs, lengthy and complex destination links are converted into concise, memorable web addresses that are easy to copy, share across teams, and monitor for link health.
+            </p>
+          </section>
+
+          <!-- Short URL Section -->
+          <section class="landing-section glass-panel short-url-panel" id="shortUrlSection">
+            <h2 class="section-title">Create Short URL</h2>
+            <p class="section-desc">Convert a long web address into a shorter, shareable link.</p>
+            <form id="landingShortForm" novalidate>
+              <div class="field">
+                <label for="landingLongUrl">Destination URL</label>
+                <input class="input" id="landingLongUrl" type="url" placeholder="https://example.com/long-page-link">
+              </div>
+              <p class="form-error" id="landingShortError" role="alert"></p>
+              <button class="btn btn-primary" type="submit" style="width:100%">Create Short URL</button>
+            </form>
+            <div id="landingShortResult" class="result-box hidden" role="status"></div>
+            <div class="short-url-note">
+              <p class="card-meta">Enter any long web address above. Saving links and generating custom short URLs connects directly to your LinkSphere workspace once signed in.</p>
+            </div>
+          </section>
+        </div>
+
+        <!-- SIGN IN POPUP MODAL -->
+        <div class="modal-backdrop hidden" id="signInModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="signInModalTitle">
+          <div class="modal auth-card" id="signInModal">
+            <div class="modal-header-row">
+              <h2 id="signInModalTitle">Sign In</h2>
+              <button class="icon-btn modal-close-btn" type="button" data-action="closeSignInModal" aria-label="Close Sign In modal" title="Close">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <p class="sub">Save, organise, share and monitor your links.</p>
+            <form id="userLoginForm" novalidate>
+              <div class="field">
+                <label for="ulEmail">Email</label>
+                <input class="input" id="ulEmail" type="email" autocomplete="username" placeholder="you@example.com">
+              </div>
+              <div class="field">
+                <label for="ulPassword">Password</label>
+                <input class="input" id="ulPassword" type="password" autocomplete="current-password" placeholder="Your password">
+              </div>
+              <p class="form-error" id="ulError" role="alert"></p>
+              <button class="btn btn-primary" type="submit" style="width:100%">Sign In</button>
+            </form>
+            <div class="auth-register-row">
+              <span>Don't have an account?</span>
+              <a class="link-btn" href="#screen-register" data-action="goRegisterFromModal">Create account</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- REGISTER SCREEN -->
+        <div id="screen-register" class="auth-card glass-panel hidden">
+          <div class="logo" id="authLogo2"></div>
+          <h1>Create account</h1>
+          <p class="sub">Create an account to save and manage links.</p>
+          <form id="registerForm" novalidate>
+            <div class="field"><label for="rgName">Full name</label><input class="input" id="rgName" type="text"
+                autocomplete="name"></div>
+            <div class="field"><label for="rgEmail">Email</label><input class="input" id="rgEmail" type="email"
+                autocomplete="username"></div>
+            <div class="field"><label for="rgPassword">Password</label><input class="input" id="rgPassword"
+                type="password" autocomplete="new-password" placeholder="At least 6 characters"></div>
+            <p class="form-error" id="rgError" role="alert"></p>
+            <button class="btn btn-primary" type="submit" style="width:100%">Register</button>
+          </form>
+          <div class="auth-links">
+            <button class="link-btn" type="button" data-action="goAuth" data-screen="user-login">Back to User
+              Login</button>
+          </div>
+        </div>
+
+        <!-- ADMIN LOGIN SCREEN (separate entrance) -->
+        <div id="screen-admin-login" class="auth-card glass-panel hidden">
+          <div class="logo" id="authLogo3"></div>
+          <h1>Admin Login</h1>
+          <p class="sub">Platform administrators only.</p>
+          <form id="adminLoginForm" novalidate>
+            <div class="field"><label for="alEmail">Email</label><input class="input" id="alEmail" type="email"
+                autocomplete="username"></div>
+            <div class="field"><label for="alPassword">Password</label><input class="input" id="alPassword"
+                type="password" autocomplete="current-password"></div>
+            <p class="form-error" id="alError" role="alert"></p>
+            <button class="btn btn-primary" type="submit" style="width:100%">Sign In as Admin</button>
+          </form>
+          <div class="auth-links">
+            <button class="link-btn" type="button" data-action="goAuth" data-screen="user-login">Back to User
+              Login</button>
+          </div>
+        </div>
+
+        <!-- PUBLIC SHORT URL SCREEN (no login needed) -->
+        <div id="screen-public" class="auth-card glass-panel hidden">
+          <div class="logo" id="authLogo4"></div>
+          <h1>Open a short URL</h1>
+          <p class="sub">Open a link directly with its short code.</p>
+          <form id="publicForm" novalidate>
+            <div class="field">
+              <label for="pubCode">Short URL or code</label>
+              <input class="input" id="pubCode" type="text" placeholder="e.g. https://lnk.sphere/sem5Kx">
+              <span class="hint">Enter the short code or complete short URL.</span>
+            </div>
+            <button class="btn btn-primary" type="submit" style="width:100%">Open</button>
+          </form>
+          <div id="publicResult" class="result-box hidden" role="status"></div>
+          <div class="auth-links">
+            <button class="link-btn" type="button" data-action="goAuth" data-screen="user-login">Back to User
+              Login</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= APPLICATION AREA (user and admin dashboards share this shell) ================= -->
+      <div id="appArea" class="app-area hidden">
+
+        <!-- TOP BAR: logo on the left, profile / theme / sign out on the right -->
+        <header class="topbar">
+          <div class="top-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" data-action="toggleMobileMenu"
+              aria-label="Toggle navigation menu" aria-expanded="false">
+              <span class="hamburger-bar"></span>
+              <span class="hamburger-bar"></span>
+              <span class="hamburger-bar"></span>
+            </button>
+            <div class="logo" id="topLogo"></div>
+          </div>
+          <div class="top-right">
+            <!-- Theme toggle button: accessible on all pages -->
+            <button class="icon-btn" id="themeBtn" type="button" data-action="toggleTheme"
+              aria-label="Switch light / dark theme" title="Light / dark theme"></button>
+            <div class="profile-chip"><span class="avatar" id="avatar">A</span><span class="name"
+                id="profileName"></span></div>
+            <button class="btn" type="button" data-action="signOut">Sign Out</button>
+          </div>
+        </header>
+
+        <div class="body-row">
+          <!-- Mobile drawer backdrop -->
+          <div class="sidebar-backdrop hidden" id="sidebarBackdrop" data-action="closeMobileMenu" aria-hidden="true">
+          </div>
+          <!-- SIDEBAR: buttons are created by renderSidebar() in script.js -->
+          <nav class="sidebar" id="sidebar" aria-label="Main navigation"></nav>
+
+          <!-- MAIN AREA -->
+          <main class="main">
+            <!-- PAGE HEADER: title, search bar and the page action button -->
+            <div class="page-head">
+              <div>
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                <p class="page-sub" id="pageSub"></p>
+              </div>
+              <div class="page-tools" id="pageTools">
+                <label class="search-box" id="searchBox">
+                  <span id="searchIcon"></span>
+                  <input id="globalSearch" type="search" placeholder="Search name, category or tags"
+                    aria-label="Search links by name, category or tags">
+                </label>
+                <button class="btn btn-primary" id="topAction" type="button" data-action="topAction"></button>
+              </div>
+            </div>
+            <!-- PAGE CONTENT: replaced by script.js every time you navigate -->
+            <div class="page-content" id="pageContent"></div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: one reusable dialog used for forms, confirmations and details -->
+  <div class="modal-backdrop hidden" id="modalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle"></h2>
+      <form id="modalForm" novalidate>
+        <div class="modal-body" id="modalBody"></div>
+        <p class="form-error" id="formError" role="alert"></p>
+        <div class="modal-actions">
+          <button class="btn" type="button" data-action="closeModal" id="modalCancel">Cancel</button>
+          <button class="btn btn-primary" type="submit" id="modalSubmit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST: short temporary feedback message (not a notification system) -->
+  <div class="toast-area" id="toastArea" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Login - LinkSphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="app-shell-inner">
+    <section class="auth-area">
+      <div id="screen-admin-login" class="auth-card glass-panel">
+        <div class="logo">
+          <svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="20" cy="20" r="15"/><ellipse cx="20" cy="20" rx="15" ry="6"/><path d="M20 5v30"/></svg>
+          <span>LinkSphere</span>
+          <span class="logo-sub">Admin</span>
+        </div>
+        <h1>Admin Login</h1>
+        <p class="sub">Platform administrators only.</p>
+
+        <form id="adminLoginForm" method="POST" action="{{ url_for('admin_login') | default('#') }}" novalidate>
+          <div class="field">
+            <label for="alEmail">Admin Email</label>
+            <input class="input" id="alEmail" name="email" type="email" autocomplete="username" placeholder="admin@linksphere.demo" value="{{ form_email | default('') }}">
+          </div>
+          <div class="field">
+            <label for="alPassword">Password</label>
+            <input class="input" id="alPassword" name="password" type="password" autocomplete="current-password" placeholder="Your password">
+          </div>
+          <p class="form-error" id="alError" role="alert">{{ error_message | default('') }}</p>
+          <button class="btn btn-primary" type="submit" style="width:100%">Sign In as Admin</button>
+        </form>
+
+        <div class="auth-links">
+          <a class="link-btn" href="{{ url_for('user_login') | default('#') }}" data-action="goAuth" data-screen="user-login">Back to User Login</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="toast-area" id="toastArea" aria-live="polite"></div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+<script src="{{ url_for('static', filename='js/links.js') }}"></script>
+<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
+
+</body>
+</html>

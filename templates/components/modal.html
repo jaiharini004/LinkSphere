@@ -1,0 +1,16 @@
+<!-- Reusable Modal Dialog Component -->
+<div class="modal-backdrop hidden" id="modalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle">{% block modal_title %}{% endblock %}</h2>
+    <form id="modalForm" novalidate>
+      <div class="modal-body" id="modalBody">
+        {% block modal_body %}{% endblock %}
+      </div>
+      <p class="form-error" id="formError" role="alert"></p>
+      <div class="modal-actions">
+        <button class="btn" type="button" data-action="closeModal" id="modalCancel">Cancel</button>
+        <button class="btn btn-primary" type="submit" id="modalSubmit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

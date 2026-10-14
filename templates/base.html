@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}LinkSphere - Save, organise, share and monitor links{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="app-shell-inner">
+
+    {% block auth_area %}
+    <!-- Authentication screens can override or hide this area -->
+    <section id="authArea" class="auth-area hidden">
+      {% block auth_content %}{% endblock %}
+    </section>
+    {% endblock %}
+
+    <!-- Main authenticated application shell -->
+    <div id="appArea" class="app-area">
+      {% include "components/navbar.html" %}
+
+      <div class="body-row">
+        <div class="sidebar-backdrop hidden" id="sidebarBackdrop" data-action="closeMobileMenu" aria-hidden="true"></div>
+        {% include "components/sidebar.html" %}
+
+        <main class="main">
+          <!-- Page Header Block -->
+          <div class="page-head">
+            <div>
+              <h1 class="page-title" id="pageTitle">{% block page_title %}Dashboard{% endblock %}</h1>
+              <p class="page-sub" id="pageSub">{% block page_subtitle %}{% endblock %}</p>
+            </div>
+            <div class="page-tools" id="pageTools">
+              {% block page_tools %}
+              {% if not is_admin %}
+              <form method="GET" action="{{ url_for('my_links') }}" class="search-box" id="searchBox" style="display:flex;margin:0;">
+                <span id="searchIcon">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+                </span>
+                <input id="globalSearch" name="q" type="search" value="{{ search_query | default('') }}" placeholder="{% block search_placeholder %}Search name, category or tags{% endblock %}" aria-label="Search">
+              </form>
+              {% if self.top_action() | trim %}
+                <button class="btn btn-primary" id="topAction" type="button" data-action="topAction">{% block top_action %}{% endblock %}</button>
+              {% endif %}
+              {% endif %}
+              {% endblock %}
+            </div>
+          </div>
+
+          <!-- Page Content Block -->
+          <div class="page-content" id="pageContent">
+            {% block content %}{% endblock %}
+          </div>
+        </main>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Shared Reusable Modal Backdrop -->
+{% include "components/modal.html" %}
+
+<!-- Shared Toast Feedback -->
+{% include "components/toast.html" %}
+
+<!-- Modular JavaScript Files -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+<script src="{{ url_for('static', filename='js/links.js') }}"></script>
+<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

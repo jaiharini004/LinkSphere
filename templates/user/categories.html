@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% from "components/link_card.html" import render_link_card %}
+
+{% block title %}{% if active_folder %}{{ active_folder.name }} - {% elif active_category %}{{ active_category.name }} - {% endif %}Categories - LinkSphere{% endblock %}
+{% block page_title %}Categories{% endblock %}
+{% block page_subtitle %}Manage categories, folders, and move links.{% endblock %}
+{% block top_action %}Create Category{% endblock %}
+{% block search_placeholder %}Search categories or folders{% endblock %}
+
+{% block content %}
+{% if active_category %}
+  {% if active_folder %}
+    <!-- FOLDER DETAIL VIEW: Links in folder -->
+    <div class="back-row" style="margin-bottom:var(--space-4);display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <a href="{{ url_for('user.categories', category_id=active_category.id) }}" class="btn btn-sm" style="text-decoration:none;">&larr; Back to {{ active_category.name }}</a>
+      <h2 class="section-title" style="margin:0;display:inline-flex;align-items:center;gap:10px;">
+        📁 {{ active_folder.name }}
+        <span class="badge badge-role">{{ active_category.name }}</span>
+      </h2>
+    </div>
+
+    <div class="card-actions" style="margin-bottom:16px;">
+      <button type="button" class="btn btn-sm btn-primary" data-action="addLink" data-category="{{ active_category.id }}" data-folder="{{ active_folder.id }}" data-catname="{{ active_category.name }}" data-foldername="{{ active_folder.name }}">Add Link</button>
+      <button type="button" class="btn btn-sm" data-action="renameFolder" data-id="{{ active_folder.id }}" data-name="{{ active_folder.name }}">Rename Folder</button>
+      <button type="button" class="btn btn-sm btn-danger" data-action="deleteFolder" data-id="{{ active_folder.id }}" data-category="{{ active_category.id }}">Delete Folder</button>
+    </div>
+
+    <section class="glass-panel team-section">
+      <div class="panel-title-row" style="margin-bottom:var(--space-4);">
+        <h3 class="panel-title">Links in this folder ({{ folder_links | length }})</h3>
+      </div>
+      {% if folder_links %}
+        <div class="card-grid">
+          {% for link in folder_links %}
+            {{ render_link_card(link, mode='active', can_manage=link.can_manage | default(True), is_favourite=link.is_favourite | default(False)) }}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <h3>No links in this folder.</h3>
+          <p>Save links into this folder using Add Link.</p>
+          <button type="button" class="btn btn-primary" data-action="addLink" data-category="{{ active_category.id }}" data-folder="{{ active_folder.id }}" data-catname="{{ active_category.name }}" data-foldername="{{ active_folder.name }}">Add Link</button>
+        </div>
+      {% endif %}
+    </section>
+
+  {% else %}
+    <!-- CATEGORY OVERVIEW VIEW: Folders + Loose Links (matches screenshot) -->
+    <div class="back-row" style="margin-bottom:var(--space-4);display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <a href="{{ url_for('user.categories') }}" class="btn btn-sm" style="text-decoration:none;">&larr; All categories</a>
+      <h2 class="section-title" style="margin:0;display:inline-flex;align-items:center;gap:10px;">
+        {{ active_category.name }}
+        <span class="badge badge-role">{% if active_category.team_name %}Team: {{ active_category.team_name }}{% else %}Personal{% endif %}</span>
+      </h2>
+    </div>
+
+    <div class="card-actions" style="margin-bottom:16px;">
+      <button type="button" class="btn btn-sm btn-primary" data-action="addLink" data-category="{{ active_category.id }}" data-catname="{{ active_category.name }}">Add Link here</button>
+      <button type="button" class="btn btn-sm" data-action="createFolder" data-category="{{ active_category.id }}">Create Folder</button>
+      <button type="button" class="btn btn-sm" data-action="renameCategory" data-id="{{ active_category.id }}" data-name="{{ active_category.name }}">Rename Category</button>
+      <button type="button" class="btn btn-sm btn-danger" data-action="deleteCategory" data-id="{{ active_category.id }}">Delete Category</button>
+    </div>
+
+    <!-- Folders Section -->
+    <section class="glass-panel team-section" style="margin-bottom:var(--space-5);">
+      <div class="panel-title-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
+        <h3 class="panel-title" style="margin:0;display:inline-flex;align-items:center;gap:8px;">📁 Folders ({{ folders | length }})</h3>
+        <button type="button" class="btn btn-sm btn-primary" data-action="createFolder" data-category="{{ active_category.id }}">Create Folder</button>
+      </div>
+
+      {% if folders %}
+        <div class="folder-grid">
+          {% for f in folders %}
+            <article class="glass-card folder-card">
+              <div class="card-head">
+                <h3>📁 {{ f.name }}</h3>
+              </div>
+              <p class="cat-stat">{{ f.links_count }} link{% if f.links_count != 1 %}s{% endif %}</p>
+              <div class="card-actions" style="margin-top:auto;padding-top:8px;">
+                <button type="button" class="btn btn-sm btn-primary" data-action="openFolder" data-id="{{ f.id }}" data-category="{{ active_category.id }}">Open</button>
+                <button type="button" class="btn btn-sm" data-action="renameFolder" data-id="{{ f.id }}" data-name="{{ f.name }}">Rename</button>
+                <button type="button" class="btn btn-sm btn-danger" data-action="deleteFolder" data-id="{{ f.id }}" data-category="{{ active_category.id }}">Delete</button>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <h3>No folders in this category</h3>
+          <p>Create folders to organise links inside this category.</p>
+          <button type="button" class="btn btn-primary" data-action="createFolder" data-category="{{ active_category.id }}">Create Folder</button>
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- Category-level links (loose links outside folders) -->
+    <section class="glass-panel team-section">
+      <div class="panel-title-row" style="margin-bottom:var(--space-4);">
+        <h3 class="panel-title">Links in category (no folder) ({{ loose_links | length }})</h3>
+      </div>
+      {% if loose_links %}
+        <div class="card-grid">
+          {% for link in loose_links %}
+            {{ render_link_card(link, mode='active', can_manage=link.can_manage | default(True), is_favourite=link.is_favourite | default(False)) }}
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="card-meta">No category-level links outside folders.</p>
+      {% endif %}
+    </section>
+  {% endif %}
+
+{% else %}
+  <!-- ALL CATEGORIES LIST -->
+  <div class="note-box">
+    Structure: Category &rarr; Folders &rarr; Link cards. A category that still has active links cannot be deleted until the links are moved.
+  </div>
+
+  <!-- Personal Categories -->
+  <h2 class="section-title" style="margin-top:0">Personal categories</h2>
+  {% if personal_categories %}
+    <div class="card-grid">
+      {% for cat in personal_categories %}
+        <article class="glass-card cat-card">
+          <h3>{{ cat.name }}</h3>
+          <span class="badge badge-role" style="align-self:flex-start">Personal</span>
+          <p class="cat-stat">{{ cat.active_links_count | default(0) }} active links · {{ cat.folders_count | default(0) }} folders</p>
+          <div class="card-actions" style="margin-top:8px">
+            <button type="button" class="btn btn-sm btn-primary" data-action="viewCategory" data-id="{{ cat.id }}">Open</button>
+            <button type="button" class="btn btn-sm" data-action="createFolder" data-category="{{ cat.id }}">Create Folder</button>
+            <button type="button" class="btn btn-sm" data-action="renameCategory" data-id="{{ cat.id }}" data-name="{{ cat.name }}">Rename</button>
+            <button type="button" class="btn btn-sm btn-danger" data-action="deleteCategory" data-id="{{ cat.id }}">Delete</button>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>No personal categories</h3>
+      <p>Create a category to organise your links.</p>
+      <button type="button" class="btn btn-primary" data-action="createCategory">Create Category</button>
+    </div>
+  {% endif %}
+
+  <!-- Shared Team Categories -->
+  <h2 class="section-title">Shared categories (from your teams)</h2>
+  {% if shared_categories %}
+    <div class="card-grid">
+      {% for cat in shared_categories %}
+        <article class="glass-card cat-card">
+          <h3>{{ cat.name }}</h3>
+          <span class="badge badge-role" style="align-self:flex-start">Team: {{ cat.team_name }}</span>
+          <p class="cat-stat">{{ cat.active_links_count | default(0) }} active links · {{ cat.folders_count | default(0) }} folders</p>
+          <div class="card-actions" style="margin-top:8px">
+            <button type="button" class="btn btn-sm btn-primary" data-action="viewCategory" data-id="{{ cat.id }}">Open</button>
+            {% if cat.can_manage %}
+              <button type="button" class="btn btn-sm" data-action="createFolder" data-category="{{ cat.id }}">Create Folder</button>
+              <button type="button" class="btn btn-sm" data-action="renameCategory" data-id="{{ cat.id }}" data-name="{{ cat.name }}">Rename</button>
+              <button type="button" class="btn btn-sm btn-danger" data-action="deleteCategory" data-id="{{ cat.id }}">Delete</button>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>No shared categories</h3>
+      <p>Shared categories appear here when created inside your teams.</p>
+    </div>
+  {% endif %}
+{% endif %}
+{% endblock %}

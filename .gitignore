@@ -1,0 +1,27 @@
+# Environment variables
+.env
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# IDE / Editor files
+.vscode/
+.idea/
+.qodo/
+
+# Node modules
+node_modules/

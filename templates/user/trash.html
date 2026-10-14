@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "components/link_card.html" import render_link_card %}
+
+{% block title %}Trash - LinkSphere{% endblock %}
+{% block page_title %}Trash{% endblock %}
+{% block page_subtitle %}Deleted links. Their short URLs stop working.{% endblock %}
+{% block search_placeholder %}Search deleted links{% endblock %}
+
+{% block content %}
+<div class="note-box">
+  Deleted links stay in Trash until you restore them or delete them permanently. Their generated short URLs show "Link unavailable" while in Trash.
+</div>
+
+{% if deleted_links %}
+  <div class="card-grid">
+    {% for link in deleted_links %}
+      {{ render_link_card(link, mode='trash', can_manage=link.can_manage | default(True)) }}
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <h3>Trash is empty</h3>
+    <p>Deleted links appear here.</p>
+  </div>
+{% endif %}
+{% endblock %}

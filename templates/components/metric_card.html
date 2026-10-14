@@ -1,0 +1,7 @@
+<!-- Reusable Metric Card Macro & Component -->
+{% macro render_metric_card(label, value, view='links', filter='all', type='total') %}
+<button type="button" class="metric-card type-{{ type }}" data-action="goto" data-view="{{ view }}" data-filter="{{ filter }}">
+  <div class="metric-label">{{ label }}</div>
+  <div class="metric-value">{{ value }}</div>
+</button>
+{% endmacro %}

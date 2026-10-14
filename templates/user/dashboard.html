@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% from "components/metric_card.html" import render_metric_card %}
+{% from "components/link_card.html" import render_link_card %}
+
+{% block title %}Dashboard - LinkSphere{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Welcome back, {{ current_user.name.split(' ')[0] if (current_user and current_user.name) else 'User' }}{% endblock %}
+
+{% block content %}
+<!-- 4 Primary Overview Cards -->
+<div class="metric-grid">
+  {{ render_metric_card('Total Links', metrics.total | default(0), view='links', filter='all', type='total') }}
+  {{ render_metric_card('Total Categories', metrics.categories | default(metrics.total_categories | default(0)), view='categories', filter='all', type='categories') }}
+  {{ render_metric_card('Total Teams', metrics.teams | default(metrics.total_teams | default(0)), view='teams', filter='all', type='teams') }}
+  {{ render_metric_card('Short URLs', metrics.shortUrls | default(metrics.short_urls | default(0)), view='links', filter='short', type='short') }}
+</div>
+
+<!-- Middle Section: Frequently Used & Health Donut Chart -->
+<div class="grid-2">
+  <section class="glass-panel">
+    <h2 class="panel-title">Frequently Used</h2>
+    {% if frequent_links %}
+      <ol class="rank-list">
+        {% for item in frequent_links %}
+          <li class="rank-item">
+            <span class="rank-num">{{ loop.index }}</span>
+            <span class="rank-name" title="{{ item.title }}">{{ item.title }}</span>
+            <span class="rank-uses">{{ item.uses }} opens</span>
+            <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="text-decoration:none;">Open</a>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="card-meta">No links recorded yet.</p>
+    {% endif %}
+    <p class="card-meta" style="margin-top:12px">Usage statistics update after opening links.</p>
+  </section>
+
+  <section class="glass-panel">
+    <h2 class="panel-title">Health Status</h2>
+    <div class="donut-wrap">
+      <svg class="donut" viewBox="0 0 42 42" role="img" aria-label="Link health overview">
+        <circle cx="21" cy="21" r="15.9155" stroke="var(--accent-soft)"/>
+        <circle class="stroke-healthy" cx="21" cy="21" r="15.9155" stroke-dasharray="75 25" stroke-dashoffset="25"/>
+        <circle class="stroke-unhealthy" cx="21" cy="21" r="15.9155" stroke-dasharray="25 75" stroke-dashoffset="50"/>
+        <text x="21" y="21.5" text-anchor="middle" font-size="9">{{ metrics.total | default(0) }}</text>
+        <text x="21" y="27" text-anchor="middle" font-size="3.6" style="font-weight:600">links</text>
+      </svg>
+      <div class="legend">
+        <button type="button" class="legend-row" data-action="goto" data-view="links" data-filter="healthy">
+          <span class="swatch sw-healthy"></span>Healthy<b>{{ metrics.healthy | default(0) }}</b>
+        </button>
+        <button type="button" class="legend-row" data-action="goto" data-view="links" data-filter="unhealthy">
+          <span class="swatch sw-unhealthy"></span>Unhealthy<b>{{ metrics.unhealthy | default(0) }}</b>
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Lower Section: Recent Links -->
+<section class="glass-panel">
+  <div class="panel-title-row">
+    <h2 class="panel-title">Recent Links</h2>
+    <div class="card-actions">
+      <button type="button" class="btn btn-sm" data-action="nav" data-view="links">Open My Link</button>
+      <button type="button" class="btn btn-sm" data-action="nav" data-view="categories">Categories</button>
+      <button type="button" class="btn btn-sm" data-action="nav" data-view="teams">Teams</button>
+    </div>
+  </div>
+  {% if recent_links %}
+    <div class="card-grid">
+      {% for link in recent_links %}
+        {{ render_link_card(link, mode='active') }}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>No links yet</h3>
+      <p>Add your first link to see it here.</p>
+      <button type="button" class="btn btn-primary" data-action="addLink">Add Link</button>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

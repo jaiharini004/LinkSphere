@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% set is_admin = True %}
+{% set active_page = 'adminUsers' %}
+
+{% block title %}User Management - LinkSphere{% endblock %}
+{% block page_title %}User Management{% endblock %}
+{% block page_subtitle %}View, edit, disable, or delete user accounts.{% endblock %}
+
+{% block content %}
+<section class="glass-panel">
+  <div class="panel-title-row">
+    <h2 class="panel-title">Users</h2>
+    <label class="search-box" style="max-width:300px;height:40px">
+      <span>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      </span>
+      <input id="userSearch" type="search" placeholder="Filter by name or email" aria-label="Filter users">
+    </label>
+  </div>
+
+  <!-- Status Filter Chips -->
+  <div class="chip-row">
+    <button type="button" class="chip active" data-action="setUserFilter" data-filter="all" aria-pressed="true">All Users ({{ users | length if users else 0 }})</button>
+    <button type="button" class="chip" data-action="setUserFilter" data-filter="active">Active ({{ active_count | default(0) }})</button>
+    <button type="button" class="chip" data-action="setUserFilter" data-filter="disabled">Disabled ({{ disabled_count | default(0) }})</button>
+    <button type="button" class="chip" data-action="setUserFilter" data-filter="admins">Admins ({{ admin_count | default(0) }})</button>
+  </div>
+
+  <!-- Desktop Users Table -->
+  <div class="table-wrap desktop-user-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Team</th>
+          <th>Status</th>
+          <th>Registered</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="userRows">
+        {% if users %}
+          {% for u in users %}
+            <tr>
+              <td><b>{{ u.name }}</b></td>
+              <td>{{ u.email }}</td>
+              <td><span class="badge badge-role">{{ u.role }}</span></td>
+              <td>{{ u.teams_label | default('-') }}</td>
+              <td><span class="badge badge-{{ u.status | lower }}">{{ u.status }}</span></td>
+              <td>{{ u.registered_date | default('Recent') }}</td>
+              <td>
+                <div class="row-actions">
+                  <button type="button" class="btn btn-sm" data-action="viewUser" data-id="{{ u.id }}">View</button>
+                  <button type="button" class="btn btn-sm" data-action="editUser" data-id="{{ u.id }}">Edit</button>
+                  {% if u.status == 'Active' %}
+                    <button type="button" class="btn btn-sm" data-action="toggleUser" data-id="{{ u.id }}">Disable</button>
+                  {% else %}
+                    <button type="button" class="btn btn-sm" data-action="toggleUser" data-id="{{ u.id }}">Enable</button>
+                  {% endif %}
+                  <button type="button" class="btn btn-sm btn-danger" data-action="deleteUser" data-id="{{ u.id }}">Delete</button>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" style="text-align:center;padding:var(--space-5);">No registered users found.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Users Cards -->
+  <div id="userMobileCards" class="user-mobile-cards">
+    {% if users %}
+      {% for u in users %}
+        <article class="user-mobile-card">
+          <div class="user-card-head">
+            <div>
+              <div class="user-card-name">{{ u.name }}</div>
+              <div class="user-card-email">{{ u.email }}</div>
+            </div>
+            <span class="badge badge-{{ u.status | lower }}">{{ u.status }}</span>
+          </div>
+          <div class="user-card-meta">
+            <span class="badge badge-role">Role: {{ u.role }}</span>
+            <span class="card-meta">Registered: {{ u.registered_date | default('Recent') }}</span>
+          </div>
+          <div class="card-meta">Teams: {{ u.teams_label | default('None') }}</div>
+          <div class="card-actions" style="margin-top:6px">
+            <button type="button" class="btn btn-sm" data-action="viewUser" data-id="{{ u.id }}">View</button>
+            <button type="button" class="btn btn-sm" data-action="editUser" data-id="{{ u.id }}">Edit</button>
+            {% if u.status == 'Active' %}
+              <button type="button" class="btn btn-sm" data-action="toggleUser" data-id="{{ u.id }}">Disable</button>
+            {% else %}
+              <button type="button" class="btn btn-sm" data-action="toggleUser" data-id="{{ u.id }}">Enable</button>
+            {% endif %}
+            <button type="button" class="btn btn-sm btn-danger" data-action="deleteUser" data-id="{{ u.id }}">Delete</button>
+          </div>
+        </article>
+      {% endfor %}
+    {% else %}
+      <p class="card-meta" style="text-align:center;padding:var(--space-4);">No registered users found.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

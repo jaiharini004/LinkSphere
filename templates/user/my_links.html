@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "components/link_card.html" import render_link_card %}
+
+{% block title %}My Links - LinkSphere{% endblock %}
+{% block page_title %}My Link{% endblock %}
+{% block page_subtitle %}Your links and links shared by your teams.{% endblock %}
+{% block top_action %}Add Link{% endblock %}
+{% block search_placeholder %}Search name, category or tags{% endblock %}
+
+{% block content %}
+<!-- Filter Chips -->
+<div class="chip-row">
+  <button type="button" class="chip {% if current_filter == 'all' or not current_filter %}active{% endif %}" data-action="setFilter" data-filter="all">All ({{ metrics.total | default(0) }})</button>
+  <button type="button" class="chip {% if current_filter == 'healthy' %}active{% endif %}" data-action="setFilter" data-filter="healthy">Healthy ({{ metrics.healthy | default(0) }})</button>
+  <button type="button" class="chip {% if current_filter == 'unhealthy' %}active{% endif %}" data-action="setFilter" data-filter="unhealthy">Unhealthy ({{ metrics.unhealthy | default(0) }})</button>
+  <button type="button" class="chip {% if current_filter == 'restricted' %}active{% endif %}" data-action="setFilter" data-filter="restricted">Restricted ({{ metrics.restricted | default(0) }})</button>
+  <button type="button" class="chip {% if current_filter == 'notverified' %}active{% endif %}" data-action="setFilter" data-filter="notverified">Not Verified ({{ metrics.notverified | default(0) }})</button>
+  <button type="button" class="chip {% if current_filter == 'short' %}active{% endif %}" data-action="setFilter" data-filter="short">Short URLs ({{ metrics.shortUrls | default(0) }})</button>
+</div>
+
+<!-- Links Grid -->
+{% if links %}
+  <div class="card-grid">
+    {% for link in links %}
+      {{ render_link_card(link, mode='active', can_manage=link.can_manage | default(True), is_favourite=link.is_favourite | default(False)) }}
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <h3>No links found</h3>
+    <p>Try a different search or filter, or save a new link.</p>
+    <button type="button" class="btn btn-primary" data-action="addLink">Add Link</button>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - LinkSphere{% endblock %}
+{% block page_title %}Settings{% endblock %}
+{% block page_subtitle %}Manage your profile, display preferences, and theme.{% endblock %}
+
+{% block content %}
+<div class="settings-grid">
+  <!-- Profile Panel -->
+  <section class="glass-panel">
+    <h2 class="panel-title">Profile</h2>
+    <form id="profileForm" novalidate>
+      <div class="field">
+        <label for="setName">Name</label>
+        <input class="input" id="setName" name="name" value="{{ current_user.name | default('Asha Raman') }}">
+      </div>
+      <div class="field">
+        <label for="setEmail">Email</label>
+        <input class="input" id="setEmail" name="email" value="{{ current_user.email | default('asha@example.com') }}" disabled>
+      </div>
+      <p class="form-error" id="profileError" role="alert"></p>
+      <button type="submit" class="btn btn-primary">Save Profile</button>
+    </form>
+  </section>
+
+  <!-- Display Preferences Panel -->
+  <section class="glass-panel">
+    <h2 class="panel-title">Display preferences</h2>
+    <label class="switch-row">
+      Compact link cards
+      <input type="checkbox" data-change="pref" data-pref="compact" {% if user_settings.compact %}checked{% endif %}>
+    </label>
+    <label class="switch-row">
+      Dark theme
+      <input type="checkbox" id="darkThemeSwitch" data-action="toggleTheme">
+    </label>
+  </section>
+</div>
+{% endblock %}
