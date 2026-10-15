@@ -42,7 +42,6 @@
           <div style="margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
             <button class="btn btn-primary" type="button" data-action="openSignInModal" style="padding:10px 24px;">Sign In</button>
             <a href="{{ url_for('register') }}" class="btn" style="text-decoration:none;padding:10px 24px;">Create Account</a>
-            <a href="{{ url_for('public_resolver') }}" class="btn" style="text-decoration:none;padding:10px 24px;">Open Short URL</a>
           </div>
         </section>
 
@@ -64,16 +63,17 @@
           <form id="landingShortForm" novalidate>
             <div class="field">
               <label for="landingLongUrl">Destination URL</label>
-              <input class="input" id="landingLongUrl" type="url" placeholder="https://example.com/long-page-link">
+              <input class="input" id="landingLongUrl" type="url" placeholder="https://example.com/long-page-link" required>
             </div>
             <p class="form-error" id="landingShortError" role="alert"></p>
             <button class="btn btn-primary" type="submit" style="width:100%">Create Short URL</button>
           </form>
           <div id="landingShortResult" class="result-box hidden" role="status"></div>
           <div class="short-url-note">
-            <p class="card-meta">Enter any long web address above. Saving links and generating custom short URLs connects directly to your LinkSphere workspace once signed in.</p>
+            <p class="card-meta">Enter any long web address above to generate an instant short URL. Sign in to save links, customize categories, and monitor health in your workspace.</p>
           </div>
         </section>
+
       </div>
 
       <!-- SIGN IN POPUP MODAL -->

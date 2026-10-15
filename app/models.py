@@ -53,7 +53,16 @@ class User(db.Model):
 
     @property
     def teams_label(self):
-        return '-'
+        try:
+            teams_as_manager = Team.query.filter_by(manager_id=self.id).all()
+            teams_as_member = Team.query.join(TeamMember, TeamMember.team_id == Team.id).filter(
+                (TeamMember.user_id == self.id) | (TeamMember.email == self.email)
+            ).all()
+            team_names = list({t.name for t in (teams_as_manager + teams_as_member)})
+            return ', '.join(sorted(team_names)) if team_names else '-'
+        except Exception:
+            return '-'
+
 
 
 class Category(db.Model):
@@ -112,7 +121,7 @@ class Link(db.Model):
     _tags = db.Column('tags', db.Text, nullable=True)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id', ondelete='SET NULL'), nullable=True)
     folder_id = db.Column(db.Integer, db.ForeignKey('folders.id', ondelete='SET NULL'), nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
     status = db.Column(db.String(50), default='active', nullable=False)  # 'active', 'archive', 'trash'
     health = db.Column('health', db.String(50), default='notverified', nullable=False)  # 'healthy', 'unhealthy', 'restricted', 'notverified'
     _is_favourite = db.Column('is_favourite', db.Integer, default=0, nullable=False)
@@ -244,8 +253,22 @@ class Team(db.Model):
         return self.manager_name
 
     @property
+    def members_list(self):
+        try:
+            return TeamMember.query.filter_by(team_id=self.id).order_by(TeamMember.created_at.asc()).all()
+        except Exception:
+            return []
+
+    @property
     def members_count(self):
-        return 1
+        try:
+            other_count = TeamMember.query.filter(
+                TeamMember.team_id == self.id,
+                (TeamMember.user_id != self.manager_id) | (TeamMember.user_id.is_(None))
+            ).count()
+            return 1 + other_count
+        except Exception:
+            return 1
 
     @property
     def shared_categories_count(self):
@@ -262,3 +285,24 @@ class Team(db.Model):
     @property
     def user_role(self):
         return 'Manager'
+
+
+class TeamMember(db.Model):
+    __tablename__ = 'team_members'
+
+    id = db.Column(db.Integer, primary_key=True)
+    team_id = db.Column(db.Integer, db.ForeignKey('teams.id', ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
+    email = db.Column(db.String(120), nullable=False)
+    role = db.Column(db.String(50), default='Member', nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('team_memberships', lazy=True, cascade='all, delete-orphan'))
+    team = db.relationship('Team', foreign_keys=[team_id], backref=db.backref('members', lazy=True, cascade='all, delete-orphan'))
+
+    @property
+    def member_name(self):
+        if self.user and self.user.name:
+            return self.user.name
+        return self.email.split('@')[0]
+

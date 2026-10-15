@@ -30,15 +30,6 @@
     {{ link.owner_label | default('Personal') }}
   </div>
 
-  {% if link.short_code %}
-    {% if mode == 'trash' %}
-      <div class="card-short"><span>Short URL unavailable while in Trash</span></div>
-    {% else %}
-      <div class="card-short">
-        <span>Short URL: <code>https://lnk.sphere/{{ link.short_code }}</code></span>
-      </div>
-    {% endif %}
-  {% endif %}
 
   <div class="card-foot">
     <div class="card-health">

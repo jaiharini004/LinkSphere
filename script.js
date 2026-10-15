@@ -876,7 +876,7 @@ function linkCardHtml(link, mode) {
     '<a class="card-url" href="' + esc(link.url) + '" target="_blank" rel="noopener noreferrer" data-action="openLink" data-id="' + link.id + '">' + esc(link.url) + '</a>' +
     (link.description && data.settings.showDescriptions ? '<p class="card-desc">' + esc(link.description) + '</p>' : '') +
     (tags ? '<div class="tag-row">' + tags + '</div>' : '') +
-    '<div class="card-meta">Category: ' + where + '<br>' + owner + '</div>' + shortLine +
+    '<div class="card-meta">Category: ' + where + '<br>' + owner + '</div>' +
     '<div class="card-foot"><div class="card-health">' + healthBadge(link.health) + '<span>Last checked (simulated): ' + timeAgo(link.lastChecked) + '</span></div>' +
     '<div class="card-actions">' + actions + '</div></div></article>';
 }
@@ -2274,24 +2274,42 @@ function handleSubmit(event) {
       if (errBox) { errBox.style.color = 'var(--bad)'; errBox.textContent = 'Please enter a valid URL starting with http:// or https://'; }
       return;
     }
-    const existing = data.links.find(function (l) { return l.url.toLowerCase() === val.toLowerCase() && l.shortCode && l.state !== 'Deleted'; });
-    if (existing) {
-      if (errBox) { errBox.textContent = ''; }
-      if (resBox) {
-        resBox.classList.remove('hidden');
-        resBox.innerHTML = '<div style="margin-bottom:6px"><strong>Generated Short URL:</strong></div>' +
-          '<div class="copy-row"><code id="landingShortOutput">' + esc(shortUrlOf(existing)) + '</code>' +
-          '<button type="button" class="btn btn-sm btn-primary" data-action="copyLandingShort">Copy Short URL</button></div>';
-      }
-      return;
+    let link = data.links.find(function (l) { return l.url.toLowerCase() === val.toLowerCase() && l.shortCode && l.state !== 'Deleted'; });
+    if (!link) {
+      const code = generateShortCode();
+      link = {
+        id: nextId('link'),
+        title: val.replace(/^https?:\/\//i, '').split('/')[0] || 'Short Link',
+        url: val,
+        shortCode: code,
+        description: '',
+        tags: [],
+        categoryId: null,
+        folderId: null,
+        createdBy: null,
+        createdAt: Date.now(),
+        state: 'Active',
+        health: 'healthy',
+        uncertainCount: 0,
+        lastChecked: Date.now(),
+        uses: 0
+      };
+      data.links.push(link);
+      saveData();
     }
-    if (errBox) {
-      errBox.style.color = 'var(--text-strong)';
-      errBox.textContent = 'Sign in or create an account to save links and generate custom short URLs.';
+    if (errBox) { errBox.textContent = ''; }
+    if (resBox) {
+      resBox.classList.remove('hidden');
+      resBox.innerHTML = '<div style="margin-bottom:6px"><strong>Generated Short URL:</strong></div>' +
+        '<div class="copy-row" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+        '<code id="landingShortOutput">' + esc(shortUrlOf(link)) + '</code>' +
+        '<button type="button" class="btn btn-sm btn-primary" data-action="copyLandingShort">Copy Short URL</button>' +
+        '<a href="' + esc(shortUrlOf(link)) + '" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="text-decoration:none;">Open</a></div>';
     }
-    openSignInModal();
+    toast('Short URL created!');
     return;
   }
+
   if (form.id === 'profileForm') {
     event.preventDefault();
     const name = $('setName').value.trim();

@@ -370,6 +370,140 @@ function viewUserDetails(userId) {
   openModal('User Account: ' + name, body, null, null);
 }
 
+function editUser(userId) {
+  fetch('/admin/users/' + userId)
+    .then(function (res) {
+      if (!res.ok) { throw new Error('Could not fetch user details'); }
+      return res.json();
+    })
+    .then(function (u) {
+      let teamOptions = '<option value="">None</option>';
+      if (u.available_teams && u.available_teams.length) {
+        u.available_teams.forEach(function (t) {
+          teamOptions += '<option value="' + t.id + '"' + (u.team_id === t.id ? ' selected' : '') + '>' + esc(t.name) + '</option>';
+        });
+      }
+
+      const bodyHtml =
+        '<div class="field">' +
+          '<label for="eu_name">Name *</label>' +
+          '<input class="input" id="eu_name" name="name" value="' + esc(u.name) + '" required>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label for="eu_email">Email</label>' +
+          '<input class="input" id="eu_email" name="email" value="' + esc(u.email) + '" readonly style="opacity:0.75;cursor:not-allowed;">' +
+        '</div>' +
+        '<div class="field">' +
+          '<label for="eu_role">Role</label>' +
+          '<select class="select" id="eu_role" name="role">' +
+            '<option value="User"' + (u.role === 'User' ? ' selected' : '') + '>User</option>' +
+            '<option value="Admin"' + (u.role === 'Admin' ? ' selected' : '') + '>Admin</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label for="eu_status">Status</label>' +
+          '<select class="select" id="eu_status" name="status">' +
+            '<option value="Active"' + (u.status === 'Active' ? ' selected' : '') + '>Active</option>' +
+            '<option value="Disabled"' + (u.status === 'Disabled' ? ' selected' : '') + '>Disabled</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label for="eu_team">Team Assignment</label>' +
+          '<select class="select" id="eu_team" name="team">' + teamOptions + '</select>' +
+          '<span class="hint">Assign user as team member or None to clear.</span>' +
+        '</div>';
+
+      openModal('Edit User: ' + u.name, bodyHtml, 'Save Changes', function (form) {
+        const name = String(form.get('name') || '').trim();
+        const role = String(form.get('role') || 'User');
+        const status = String(form.get('status') || 'Active');
+        const team = form.get('team');
+
+        if (!name) { return 'Please enter a name.'; }
+
+        fetch('/admin/users/' + userId + '/edit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name, role: role, status: status, team: team })
+        }).then(function (res) {
+          if (res.ok) {
+            toast('User updated.');
+            closeModal();
+            window.location.reload();
+          } else {
+            res.json().then(function (err) {
+              const errEl = $('formError');
+              if (errEl) { errEl.textContent = err.error || 'Could not update user.'; }
+              else { toast(err.error || 'Could not update user.', true); }
+            });
+          }
+        }).catch(function () {
+          const errEl = $('formError');
+          if (errEl) { errEl.textContent = 'Network error updating user.'; }
+        });
+      });
+    })
+    .catch(function () {
+      toast('Could not retrieve user info.', true);
+    });
+}
+
+function deleteUser(userId) {
+  const btn = document.querySelector('[data-action="deleteUser"][data-id="' + userId + '"]');
+  const name = (btn && btn.dataset.name) ? btn.dataset.name : 'this user';
+
+  confirmBox(
+    'Delete user account?',
+    'Delete <b>' + esc(name) + '</b>? Their personal categories and links will be permanently removed. Shared team resources stay safe.',
+    'Delete User',
+    function () {
+      fetch('/admin/users/' + userId + '/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }).then(function (res) {
+        if (res.ok) {
+          toast('User ' + name + ' deleted.');
+          closeModal();
+          window.location.reload();
+        } else {
+          res.json().then(function (err) {
+            toast(err.error || 'Could not delete user.', true);
+          });
+        }
+      }).catch(function () {
+        toast('Network error deleting user.', true);
+      });
+    }
+  );
+}
+
+function removeTeamMember(teamId, memberId) {
+  confirmBox(
+    'Remove team member?',
+    'Are you sure you want to remove this member from the team?',
+    'Remove Member',
+    function () {
+      fetch('/teams/' + teamId + '/members/' + memberId + '/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }).then(function (res) {
+        if (res.ok) {
+          toast('Member removed.');
+          closeModal();
+          window.location.reload();
+        } else {
+          res.json().then(function (err) {
+            toast(err.error || 'Could not remove member.', true);
+          });
+        }
+      }).catch(function () {
+        toast('Network error removing member.', true);
+      });
+    }
+  );
+}
+
+
 /* ---------------------------------------------------------------------
    Global Event Delegation
    --------------------------------------------------------------------- */
@@ -493,6 +627,15 @@ document.addEventListener('click', function (event) {
     return;
   }
 
+  if (action === 'copyLandingShort') {
+    const outputEl = $('landingShortOutput');
+    const url = d.url || (outputEl ? outputEl.textContent : '');
+    if (url) {
+      copyUrl(url);
+    }
+    return;
+  }
+
   if (action === 'copyUrl') {
     const card = element.closest('.link-card');
     const urlEl = card ? card.querySelector('.card-url') : null;
@@ -598,6 +741,21 @@ document.addEventListener('click', function (event) {
 
   if (action === 'toggleUser') {
     toggleUser(d.id);
+    return;
+  }
+
+  if (action === 'editUser') {
+    editUser(d.id);
+    return;
+  }
+
+  if (action === 'deleteUser') {
+    deleteUser(d.id);
+    return;
+  }
+
+  if (action === 'removeMember') {
+    removeTeamMember(d.team, d.member);
     return;
   }
 
@@ -713,11 +871,74 @@ document.addEventListener('submit', function (event) {
 
   if (form.id === 'landingShortForm') {
     event.preventDefault();
-    openSignInModal();
-    toast('Please sign in or create an account to save links and generate custom short URLs.');
+    const urlInput = $('landingLongUrl');
+    const errBox = $('landingShortError');
+    const resBox = $('landingShortResult');
+    const val = urlInput ? urlInput.value.trim() : '';
+
+    if (resBox) { resBox.classList.add('hidden'); resBox.innerHTML = ''; }
+    if (errBox) { errBox.textContent = ''; }
+
+    if (!val) {
+      if (errBox) { errBox.textContent = 'Please enter a URL to shorten.'; }
+      return;
+    }
+
+    fetch('/short/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: val })
+    }).then(function (res) {
+      return res.json().then(function (data) {
+        if (!res.ok) {
+          if (errBox) { errBox.textContent = data.error || 'Could not create short URL.'; }
+        } else {
+          if (errBox) { errBox.textContent = ''; }
+          if (resBox) {
+            resBox.classList.remove('hidden');
+            resBox.innerHTML =
+              '<div style="margin-bottom:8px"><strong>Generated Short URL:</strong></div>' +
+              '<div class="copy-row" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                '<code id="landingShortOutput" style="font-weight:600;padding:6px 12px;background:rgba(255,255,255,0.08);border-radius:6px;">' + esc(data.short_url) + '</code>' +
+                '<button type="button" class="btn btn-sm btn-primary" data-action="copyLandingShort" data-url="' + esc(data.short_url) + '">Copy Short URL</button>' +
+                '<a href="' + esc(data.short_url) + '" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="text-decoration:none;">Open</a>' +
+              '</div>';
+          }
+          toast('Short URL created!');
+        }
+      });
+    }).catch(function () {
+      if (errBox) { errBox.textContent = 'Network error creating short URL.'; }
+    });
     return;
   }
 });
+
+/* Team member role change listener */
+document.addEventListener('change', function (event) {
+  const target = event.target;
+  if (target && target.dataset.change === 'changeRole') {
+    const teamId = target.dataset.team;
+    const memberId = target.dataset.member;
+    const newRole = target.value;
+    if (teamId && memberId) {
+      fetch('/teams/' + teamId + '/members/' + memberId + '/role', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole })
+      }).then(function (res) {
+        if (res.ok) {
+          toast('Member role updated to ' + newRole + '.');
+        } else {
+          res.json().then(function (err) { toast(err.error || 'Could not update role.', true); });
+        }
+      }).catch(function () {
+        toast('Network error updating role.', true);
+      });
+    }
+  }
+});
+
 
 /* Keyboard Escape to dismiss modals and open menus */
 document.addEventListener('keydown', function (event) {
