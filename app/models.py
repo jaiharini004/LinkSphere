@@ -229,12 +229,20 @@ class Team(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    leader_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    leader_id = db.Column('manager_id', db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     @property
     def leader(self):
         return self.owner
+
+    @property
+    def manager_id(self):
+        return self.leader_id
+
+    @manager_id.setter
+    def manager_id(self, val):
+        self.leader_id = val
 
     @property
     def owner_id(self):
