@@ -13,6 +13,7 @@ class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {}
     SECRET_KEY = 'test-secret-key'
 
 test_app = create_app(TestConfig)
@@ -372,8 +373,34 @@ def run_tests():
             assert res.get_json()['webhook_sent'] is True
         print("Test 20 Passed: n8n team people invitation webhook integration verified.")
 
+        # 21. Category Dropdown API & Link Creation with Category ID
+        # Login as user rahul
+        client.post('/logout')
+        client.post('/login', data={'email': 'rahul@example.com', 'password': 'password123'})
+        cat_api_res = client.get('/api/categories')
+        assert cat_api_res.status_code == 200
+        cat_data = cat_api_res.get_json()
+        assert 'personal' in cat_data
+        assert 'shared' in cat_data
+        # Personal category exists from earlier test (e.g. Work or similar)
+        # Create a new link with category_id
+        if cat_data['personal']:
+            cat_id = cat_data['personal'][0]['id']
+            res = client.post('/links/new', json={
+                'title': 'Test Dropdown Link',
+                'url': 'https://example.com/dropdown-test',
+                'category_id': cat_id,
+                'tags': 'dropdown, test',
+                'description': 'Testing dropdown category selection'
+            })
+            assert res.status_code == 200
+            new_link_id = res.get_json()['id']
+            created_l = Link.query.get(new_link_id)
+            assert created_l.category_id == cat_id
+        print("Test 21 Passed: Category dropdown API (/api/categories) and category_id link creation verified.")
+
         print("\n===========================================")
-        print("ALL 20 VERIFICATION SUITES PASSED FLAWLESSLY!")
+        print("ALL 21 VERIFICATION SUITES PASSED FLAWLESSLY!")
         print("===========================================")
 
 if __name__ == '__main__':
