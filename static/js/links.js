@@ -4,7 +4,80 @@
    ===================================================================== */
 'use strict';
 
+let appCategoriesCache = null;
+
+function fetchCategoriesList(callback) {
+  fetch('/api/categories', {
+    headers: { 'Accept': 'application/json' }
+  })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      appCategoriesCache = data.categories || [];
+      if (callback) { callback(appCategoriesCache); }
+    })
+    .catch(function () {
+      if (callback) { callback(appCategoriesCache || []); }
+    });
+}
+
+// Prefetch categories when the script is loaded
+if (typeof window !== 'undefined') {
+  fetchCategoriesList();
+}
+
+function buildCategorySelectOptions(cats, selectedId) {
+  let html = '<option value="">General (No Category)</option>';
+  const personal = [];
+  const shared = [];
+  (cats || []).forEach(function (c) {
+    if (c.team_name) {
+      shared.push(c);
+    } else {
+      personal.push(c);
+    }
+  });
+
+  if (personal.length > 0) {
+    html += '<optgroup label="Personal Categories">';
+    personal.forEach(function (c) {
+      const isSel = String(c.id) === String(selectedId) ? ' selected' : '';
+      html += '<option value="' + esc(c.id) + '"' + isSel + '>' + esc(c.name) + '</option>';
+    });
+    html += '</optgroup>';
+  }
+
+  if (shared.length > 0) {
+    html += '<optgroup label="Team Categories">';
+    shared.forEach(function (c) {
+      const isSel = String(c.id) === String(selectedId) ? ' selected' : '';
+      html += '<option value="' + esc(c.id) + '"' + isSel + '>' + esc(c.name) + ' (' + esc(c.team_name) + ')</option>';
+    });
+    html += '</optgroup>';
+  }
+
+  html += '<option value="__new__">+ Add New Category...</option>';
+  return html;
+}
+
 function openAddLinkForm(defaultCatId, defaultFolderId, defaultCatName, defaultFolderName) {
+  if (appCategoriesCache === null) {
+    fetchCategoriesList(function (cats) {
+      renderAddLinkModal(defaultCatId, defaultFolderId, defaultCatName, defaultFolderName, cats);
+    });
+  } else {
+    renderAddLinkModal(defaultCatId, defaultFolderId, defaultCatName, defaultFolderName, appCategoriesCache);
+    // Background refresh in case categories were added elsewhere
+    fetchCategoriesList(function (freshCats) {
+      const sel = $('m_category_select');
+      if (sel && sel.value !== '__new__') {
+        const currVal = sel.value;
+        sel.innerHTML = buildCategorySelectOptions(freshCats, currVal);
+      }
+    });
+  }
+}
+
+function renderAddLinkModal(defaultCatId, defaultFolderId, defaultCatName, defaultFolderName, categoriesList) {
   let targetInfo = '';
   if (defaultCatName || defaultFolderName) {
     const loc = (defaultCatName ? defaultCatName : '') + (defaultFolderName ? ' > ' + defaultFolderName : '');
@@ -17,10 +90,23 @@ function openAddLinkForm(defaultCatId, defaultFolderId, defaultCatName, defaultF
   let catField = '';
   if (!defaultCatId && !defaultFolderId) {
     catField =
-      '<div class="field">' +
-        '<label for="m_category_name">Category</label>' +
-        '<input class="input" id="m_category_name" name="category_name" placeholder="e.g. Work, College, or Inspiration">' +
-        '<span class="hint">Type a category name or leave empty for general.</span>' +
+      '<div class="field" id="m_cat_field_wrapper">' +
+        '<label for="m_category_select">Category</label>' +
+        '<div style="display:flex; gap:8px; align-items:center;">' +
+          '<select class="input select" id="m_category_select" name="category_id" style="flex:1;">' +
+            buildCategorySelectOptions(categoriesList, '') +
+          '</select>' +
+          '<button type="button" class="btn btn-sm" id="btn_new_cat_toggle" title="Add a new category" style="padding:10px 14px; white-space:nowrap;">+ New</button>' +
+        '</div>' +
+        '<div id="m_new_cat_container" style="display:none; margin-top:8px; padding:10px 12px; background:var(--accent-soft); border:1px solid var(--border-soft); border-radius:var(--radius-sm);">' +
+          '<label for="m_new_category_name" style="font-size:12px; font-weight:600; display:block; margin-bottom:6px; color:var(--text-strong);">New Category Name</label>' +
+          '<div style="display:flex; gap:8px;">' +
+            '<input class="input" id="m_new_category_name" placeholder="e.g. Work, College, Inspiration" style="flex:1; padding:8px 12px; font-size:13px;">' +
+            '<button type="button" class="btn btn-sm btn-primary" id="btn_save_inline_cat" style="padding:8px 14px;">Add</button>' +
+          '</div>' +
+          '<span class="hint" id="m_new_cat_hint" style="margin-top:4px; display:block; font-size:11px;">Type category name and click Add to immediately include in dropdown.</span>' +
+        '</div>' +
+        '<span class="hint" id="m_cat_hint">Select an existing category or create a new one.</span>' +
       '</div>';
   }
 
@@ -48,7 +134,9 @@ function openAddLinkForm(defaultCatId, defaultFolderId, defaultCatName, defaultF
   openModal('Add Link', bodyHtml, 'Save Link', function (form) {
     const title = String(form.get('title') || '').trim();
     const url = String(form.get('url') || '').trim();
-    const catName = String(form.get('category_name') || '').trim();
+    const selCatVal = String(form.get('category_id') || '').trim();
+    const newCatInput = $('m_new_category_name');
+    const newCatVal = newCatInput ? String(newCatInput.value || '').trim() : '';
     const tags = String(form.get('tags') || '').trim();
     const description = String(form.get('description') || '').trim();
 
@@ -88,28 +176,134 @@ function openAddLinkForm(defaultCatId, defaultFolderId, defaultCatName, defaultF
 
     if (defaultCatId || defaultFolderId) {
       submitLink(defaultCatId, defaultFolderId);
-    } else if (catName) {
-      fetch('/categories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: catName })
-      }).then(function (res) {
-        return res.json();
-      }).then(function (data) {
-        submitLink(data.id || null, null);
-      }).catch(function () {
+    } else if (selCatVal === '__new__' || newCatVal) {
+      if (newCatVal) {
+        fetch('/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newCatVal })
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (data && data.id) {
+              if (!appCategoriesCache) { appCategoriesCache = []; }
+              if (!appCategoriesCache.some(function (c) { return String(c.id) === String(data.id); })) {
+                appCategoriesCache.push({ id: data.id, name: data.name, team_name: data.team_name || null });
+              }
+              submitLink(data.id, null);
+            } else {
+              submitLink(null, null);
+            }
+          })
+          .catch(function () {
+            submitLink(null, null);
+          });
+      } else {
         submitLink(null, null);
-      });
+      }
+    } else if (selCatVal) {
+      submitLink(selCatVal, null);
     } else {
       submitLink(null, null);
     }
   });
+
+  // Attach interactive category controls inside modal
+  setTimeout(function () {
+    const catSelect = $('m_category_select');
+    const toggleBtn = $('btn_new_cat_toggle');
+    const newCatContainer = $('m_new_cat_container');
+    const newCatInput = $('m_new_category_name');
+    const saveCatBtn = $('btn_save_inline_cat');
+
+    if (catSelect && newCatContainer && newCatInput) {
+      const showNewCat = function () {
+        newCatContainer.style.display = 'block';
+        newCatInput.focus();
+      };
+      const hideNewCat = function () {
+        newCatContainer.style.display = 'none';
+        newCatInput.value = '';
+      };
+
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (newCatContainer.style.display === 'none') {
+            showNewCat();
+          } else {
+            hideNewCat();
+          }
+        });
+      }
+
+      catSelect.addEventListener('change', function () {
+        if (catSelect.value === '__new__') {
+          showNewCat();
+        } else {
+          newCatContainer.style.display = 'none';
+        }
+      });
+
+      const handleAddCategory = function () {
+        const catName = String(newCatInput.value || '').trim();
+        if (!catName) {
+          toast('Please enter a category name.', true);
+          newCatInput.focus();
+          return;
+        }
+        if (saveCatBtn) { saveCatBtn.disabled = true; }
+
+        fetch('/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: catName })
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (saveCatBtn) { saveCatBtn.disabled = false; }
+            if (data && data.id) {
+              if (!appCategoriesCache) { appCategoriesCache = []; }
+              const exists = appCategoriesCache.some(function (c) { return String(c.id) === String(data.id); });
+              if (!exists) {
+                appCategoriesCache.push({ id: data.id, name: data.name, team_name: data.team_name || null });
+              }
+              catSelect.innerHTML = buildCategorySelectOptions(appCategoriesCache, data.id);
+              catSelect.value = String(data.id);
+              hideNewCat();
+              toast('Category "' + esc(data.name) + '" added to dropdown.');
+            } else {
+              toast((data && data.error) || 'Failed to add category.', true);
+            }
+          })
+          .catch(function () {
+            if (saveCatBtn) { saveCatBtn.disabled = false; }
+            toast('Network error adding category.', true);
+          });
+      };
+
+      if (saveCatBtn) {
+        saveCatBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          handleAddCategory();
+        });
+      }
+
+      newCatInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleAddCategory();
+        }
+      });
+    }
+  }, 40);
 }
 
 function openEditLinkForm(linkId) {
   fetch('/links/' + linkId + '/edit')
     .then(function (res) { return res.json(); })
     .then(function (link) {
+      const cats = appCategoriesCache || [];
       const bodyHtml =
         '<div class="field">' +
           '<label for="m_edit_title">Title *</label>' +
@@ -118,6 +312,12 @@ function openEditLinkForm(linkId) {
         '<div class="field">' +
           '<label for="m_edit_url">Destination URL *</label>' +
           '<input class="input" id="m_edit_url" name="url" type="url" value="' + esc(link.url) + '" required>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label for="m_edit_category">Category</label>' +
+          '<select class="input select" id="m_edit_category" name="category_id">' +
+            buildCategorySelectOptions(cats, link.category_id || '') +
+          '</select>' +
         '</div>' +
         '<div class="field">' +
           '<label for="m_edit_tags">Tags</label>' +
@@ -131,6 +331,7 @@ function openEditLinkForm(linkId) {
       openModal('Edit Link', bodyHtml, 'Save Changes', function (form) {
         const title = String(form.get('title') || '').trim();
         const url = String(form.get('url') || '').trim();
+        const categoryId = String(form.get('category_id') || '').trim();
         const tags = String(form.get('tags') || '').trim();
         const description = String(form.get('description') || '').trim();
 
@@ -143,6 +344,7 @@ function openEditLinkForm(linkId) {
           body: JSON.stringify({
             title: title,
             url: url,
+            category_id: categoryId || null,
             tags: tags,
             description: description
           })
@@ -163,6 +365,7 @@ function openEditLinkForm(linkId) {
     }).catch(function () {
       toast('Failed to load link data.', true);
     });
+}
 }
 
 function toggleFavourite(linkId) {

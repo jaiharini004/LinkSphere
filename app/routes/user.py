@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, abort, flash
 from app.extensions import db
 from sqlalchemy import func
-from app.models import User, Link, Category, Team, Folder, TeamMember
+from app.models import User, Link, Category, Team, Folder, Teampeople
 from app.helpers import (
     get_current_user,
     login_required,
@@ -135,13 +135,25 @@ def new_link():
             tags_str = str(raw_tags).strip()
 
         cat_id = None
+        category_name = (data.get('category_name') or '').strip()
         if category_id:
             try:
                 cat = Category.query.filter_by(id=int(category_id)).first()
-                if cat and (cat.user_id == user.id or cat.team_name in [t.name for t in Team.query.filter_by(manager_id=user.id).all()]):
-                    cat_id = cat.id
+                if cat:
+                    member_team_ids = [m.team_id for m in TeamMember.query.filter((TeamMember.user_id == user.id) | (TeamMember.email == user.email)).all()]
+                    user_teams = Team.query.filter((Team.leader_id == user.id) | (Team.id.in_(member_team_ids))).all()
+                    allowed_team_names = [t.name for t in user_teams]
+                    if cat.user_id == user.id or (cat.team_name and cat.team_name in allowed_team_names):
+                        cat_id = cat.id
             except (ValueError, TypeError):
                 pass
+        elif category_name:
+            cat = Category.query.filter_by(user_id=user.id, name=category_name).first()
+            if not cat:
+                cat = Category(name=category_name, user_id=user.id)
+                db.session.add(cat)
+                db.session.commit()
+            cat_id = cat.id
 
         fld_id = None
         if folder_id:
@@ -347,7 +359,7 @@ def check_single_link_health(link_id):
     link = Link.query.get_or_404(link_id)
 
     if link.user_id != user.id:
-        user_teams = [t.name for t in Team.query.filter_by(manager_id=user.id).all()]
+        user_teams = [t.name for t in Team.query.filter_by(leader_id=user.id).all()]
         if not link.category or link.category.team_name not in user_teams:
             abort(403)
 
@@ -442,11 +454,51 @@ def trash():
     )
 
 
+@user_bp.route('/api/categories', methods=['GET'])
+@login_required
+def api_categories():
+    user = get_current_user()
+    if not user:
+        return jsonify({'categories': []}), 401
+
+    personal = Category.query.filter(
+        Category.user_id == user.id,
+        (Category.team_name.is_(None)) | (Category.team_name == '')
+    ).order_by(Category.name.asc()).all()
+
+    member_team_ids = [m.team_id for m in TeamMember.query.filter(
+        (TeamMember.user_id == user.id) | (TeamMember.email == user.email)
+    ).all()]
+    user_teams = Team.query.filter(
+        (Team.leader_id == user.id) | (Team.id.in_(member_team_ids))
+    ).all()
+    user_team_names = [t.name for t in user_teams]
+    shared = Category.query.filter(
+        Category.team_name.in_(user_team_names)
+    ).order_by(Category.name.asc()).all() if user_team_names else []
+
+    all_cats = []
+    seen = set()
+    for c in personal:
+        if c.id not in seen:
+            seen.add(c.id)
+            all_cats.append({'id': c.id, 'name': c.name, 'team_name': None, 'type': 'personal'})
+    for c in shared:
+        if c.id not in seen:
+            seen.add(c.id)
+            all_cats.append({'id': c.id, 'name': c.name, 'team_name': c.team_name, 'type': 'shared'})
+
+    return jsonify({'categories': all_cats})
+
+
 @user_bp.route('/categories', methods=['GET', 'POST'], defaults={'category_id': None})
 @user_bp.route('/categories/<int:category_id>', methods=['GET'])
 @login_required
 def categories(category_id=None):
     user = get_current_user()
+    if request.method == 'GET' and not category_id and (request.is_json or request.headers.get('Accept') == 'application/json' or request.args.get('format') == 'json'):
+        return api_categories()
+
     if request.method == 'POST':
         data = request.get_json(silent=True) or request.form
         name = (data.get('name') or '').strip()
@@ -461,9 +513,9 @@ def categories(category_id=None):
 
         existing = Category.query.filter_by(user_id=user.id, name=name).first()
         if existing:
-            error_msg = 'A category with this name already exists.'
             if request.is_json:
-                return jsonify({'error': error_msg}), 400
+                return jsonify({'status': 'ok', 'id': existing.id, 'name': existing.name, 'team_name': existing.team_name, 'existing': True})
+            error_msg = 'A category with this name already exists.'
             flash(error_msg, 'error')
             return redirect(url_for('user.categories'))
 
@@ -497,7 +549,7 @@ def categories(category_id=None):
     if category_id:
         active_category = Category.query.filter_by(id=category_id, user_id=user.id).first()
         if not active_category:
-            user_teams = Team.query.filter_by(manager_id=user.id).all()
+            user_teams = Team.query.filter_by(leader_id=user.id).all()
             user_team_names = [t.name for t in user_teams]
             active_category = Category.query.filter(
                 Category.id == category_id,
@@ -526,7 +578,7 @@ def categories(category_id=None):
         (Category.team_name.is_(None)) | (Category.team_name == '')
     ).order_by(Category.created_at.desc()).all()
 
-    user_teams = Team.query.filter_by(manager_id=user.id).all()
+    user_teams = Team.query.filter_by(leader_id=user.id).all()
     user_team_names = [t.name for t in user_teams]
     shared_categories = Category.query.filter(
         Category.team_name.in_(user_team_names)
@@ -551,7 +603,7 @@ def create_folder(category_id):
     user = get_current_user()
     category = Category.query.get_or_404(category_id)
     if category.user_id != user.id:
-        user_teams = [t.name for t in Team.query.filter_by(manager_id=user.id).all()]
+        user_teams = [t.name for t in Team.query.filter_by(leader_id=user.id).all()]
         if not category.team_name or category.team_name not in user_teams:
             abort(403)
 
@@ -656,7 +708,7 @@ def teams(team_id=None):
             flash(error_msg, 'error')
             return redirect(url_for('user.teams'))
 
-        new_team = Team(name=name, description=description, manager_id=user.id)
+        new_team = Team(name=name, description=description, leader_id=user.id)
         db.session.add(new_team)
         db.session.commit()
 
@@ -670,30 +722,30 @@ def teams(team_id=None):
         except (ValueError, TypeError):
             pass
 
-    # Find all teams where user is manager or a member
-    member_team_ids = [m.team_id for m in TeamMember.query.filter((TeamMember.user_id == user.id) | (TeamMember.email == user.email)).all()]
+    # Find all teams where user is leader or a people
+    people_team_ids = [m.team_id for m in Teampeople.query.filter((Teampeople.user_id == user.id) | (Teampeople.email == user.email)).all()]
     teams_list = Team.query.filter(
-        (Team.manager_id == user.id) | (Team.id.in_(member_team_ids))
+        (Team.leader_id == user.id) | (Team.id.in_(people_team_ids))
     ).order_by(Team.created_at.desc()).all()
 
     active_team = None
     shared_categories = []
     shared_links = []
-    is_manager = False
+    is_leader = False
 
     if team_id:
         active_team = Team.query.filter(
-            (Team.id == team_id) & ((Team.manager_id == user.id) | (Team.id.in_(member_team_ids)))
+            (Team.id == team_id) & ((Team.leader_id == user.id) | (Team.id.in_(people_team_ids)))
         ).first()
 
     if active_team:
-        is_manager = (active_team.manager_id == user.id)
-        if not is_manager:
-            user_mem = TeamMember.query.filter_by(team_id=active_team.id).filter(
-                (TeamMember.user_id == user.id) | (TeamMember.email == user.email)
+        is_leader = (active_team.leader_id == user.id)
+        if not is_leader:
+            user_mem = Teampeople.query.filter_by(team_id=active_team.id).filter(
+                (Teampeople.user_id == user.id) | (Teampeople.email == user.email)
             ).first()
-            if user_mem and user_mem.role == 'Manager':
-                is_manager = True
+            if user_mem and user_mem.role == 'leader':
+                is_leader = True
 
         shared_categories = Category.query.filter_by(team_name=active_team.name).all()
         cat_ids = [c.id for c in shared_categories]
@@ -707,7 +759,7 @@ def teams(team_id=None):
         'user/teams.html',
         teams=teams_list,
         active_team=active_team,
-        is_manager=is_manager,
+        is_leader=is_leader,
         shared_categories=shared_categories,
         shared_links=shared_links,
         active_page='teams',
@@ -718,7 +770,7 @@ def teams(team_id=None):
 @login_required
 def edit_team(team_id):
     user = get_current_user()
-    team = Team.query.filter_by(id=team_id, manager_id=user.id).first_or_404()
+    team = Team.query.filter_by(id=team_id, leader_id=user.id).first_or_404()
 
     data = request.get_json(silent=True) or request.form
     new_name = (data.get('name') or '').strip()
@@ -742,7 +794,7 @@ def edit_team(team_id):
 @login_required
 def delete_team(team_id):
     user = get_current_user()
-    team = Team.query.filter_by(id=team_id, manager_id=user.id).first_or_404()
+    team = Team.query.filter_by(id=team_id, leader_id=user.id).first_or_404()
 
     Category.query.filter_by(team_name=team.name).update({'team_name': None})
     db.session.delete(team)
@@ -753,40 +805,40 @@ def delete_team(team_id):
     return redirect(url_for('user.teams'))
 
 
-@user_bp.route('/teams/<int:team_id>/members', methods=['POST'])
+@user_bp.route('/teams/<int:team_id>/peoples', methods=['POST'])
 @login_required
-def add_team_member(team_id):
+def add_team_people(team_id):
     user = get_current_user()
-    team = Team.query.filter_by(id=team_id, manager_id=user.id).first_or_404()
+    team = Team.query.filter_by(id=team_id, leader_id=user.id).first_or_404()
 
     data = request.get_json(silent=True) or request.form
     email = (data.get('email') or '').strip().lower()
-    role = (data.get('role') or 'Member').strip()
+    role = (data.get('role') or 'people').strip()
 
     if not email:
         return jsonify({'error': 'Please provide an email address.'}), 400
 
-    # Check if target is manager
+    # Check if target is leader
     if team.owner and team.owner.email.lower() == email:
-        return jsonify({'error': 'User is already the manager of this team.'}), 400
+        return jsonify({'error': 'User is already the leader of this team.'}), 400
 
-    # Check if already a member
-    existing = TeamMember.query.filter_by(team_id=team.id).filter(func.lower(TeamMember.email) == email).first()
+    # Check if already a people
+    existing = Teampeople.query.filter_by(team_id=team.id).filter(func.lower(Teampeople.email) == email).first()
     if existing:
-        return jsonify({'error': f"'{email}' is already a member of this team."}), 400
+        return jsonify({'error': f"'{email}' is already a people of this team."}), 400
 
     # Check if registered user exists
     reg_user = User.query.filter(func.lower(User.email) == email).first()
     if reg_user and reg_user.is_admin:
-        return jsonify({'error': 'Platform administrators cannot be added as regular team members.'}), 400
+        return jsonify({'error': 'Platform administrators cannot be added as regular team peoples.'}), 400
 
-    member = TeamMember(
+    people = Teampeople(
         team_id=team.id,
         user_id=reg_user.id if reg_user else None,
         email=email,
         role=role
     )
-    db.session.add(member)
+    db.session.add(people)
     db.session.commit()
 
     from app.helpers import send_invitation_email
@@ -802,45 +854,45 @@ def add_team_member(team_id):
         'message': f'Added {email} to {team.name} as {role}',
         'email': email,
         'role': role,
-        'members_count': team.members_count,
+        'peoples_count': team.peoples_count,
         'webhook_sent': webhook_sent
     })
 
 
-@user_bp.route('/teams/<int:team_id>/members/<int:member_id>/delete', methods=['POST'])
+@user_bp.route('/teams/<int:team_id>/peoples/<int:people_id>/delete', methods=['POST'])
 @login_required
-def remove_team_member(team_id, member_id):
+def remove_team_people(team_id, people_id):
     user = get_current_user()
     team = Team.query.get_or_404(team_id)
-    member = TeamMember.query.filter_by(id=member_id, team_id=team.id).first_or_404()
+    people = Teampeople.query.filter_by(id=people_id, team_id=team.id).first_or_404()
 
-    # Permission check: team manager OR the member themselves
-    is_manager = (team.manager_id == user.id)
-    is_self = (member.user_id == user.id or member.email.lower() == user.email.lower())
+    # Permission check: team leader OR the people themselves
+    is_leader = (team.leader_id == user.id)
+    is_self = (people.user_id == user.id or people.email.lower() == user.email.lower())
 
-    if not (is_manager or is_self):
-        return jsonify({'error': 'You do not have permission to remove this member.'}), 403
+    if not (is_leader or is_self):
+        return jsonify({'error': 'You do not have permission to remove this people.'}), 403
 
-    db.session.delete(member)
+    db.session.delete(people)
     db.session.commit()
-    return jsonify({'status': 'ok', 'message': 'Member removed from team.', 'members_count': team.members_count})
+    return jsonify({'status': 'ok', 'message': 'people removed from team.', 'peoples_count': team.peoples_count})
 
 
-@user_bp.route('/teams/<int:team_id>/members/<int:member_id>/role', methods=['POST'])
+@user_bp.route('/teams/<int:team_id>/peoples/<int:people_id>/role', methods=['POST'])
 @login_required
-def change_team_member_role(team_id, member_id):
+def change_team_people_role(team_id, people_id):
     user = get_current_user()
-    team = Team.query.filter_by(id=team_id, manager_id=user.id).first_or_404()
-    member = TeamMember.query.filter_by(id=member_id, team_id=team.id).first_or_404()
+    team = Team.query.filter_by(id=team_id, leader_id=user.id).first_or_404()
+    people = Teampeople.query.filter_by(id=people_id, team_id=team.id).first_or_404()
 
     data = request.get_json(silent=True) or request.form
-    new_role = (data.get('role') or 'Member').strip()
-    if new_role not in ['Manager', 'Member']:
+    new_role = (data.get('role') or 'people').strip()
+    if new_role not in ['leader', 'people']:
         return jsonify({'error': 'Invalid role.'}), 400
 
-    member.role = new_role
+    people.role = new_role
     db.session.commit()
-    return jsonify({'status': 'ok', 'role': member.role})
+    return jsonify({'status': 'ok', 'role': people.role})
 
 
 

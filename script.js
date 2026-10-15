@@ -53,17 +53,17 @@ function logoSvg() {
 
 // Page settings: title, sidebar label/icon, whether the search bar shows, and the top action button.
 const PAGES = {
-  overview:   { title: 'Dashboard',  label: 'Dashboard',  icon: 'grid',     search: false, action: null },
-  links:      { title: 'My Link',    label: 'My Link',    icon: 'link',     search: true,  action: 'Add Link',        searchHint: 'Search name, category or tags' },
-  categories: { title: 'Categories', label: 'Categories', icon: 'folder',   search: true,  action: 'Create Category', searchHint: 'Search categories or folders' },
-  teams:      { title: 'Teams',      label: 'Teams',      icon: 'users',    search: true,  action: 'Create Team',     searchHint: 'Search teams' },
-  favourites: { title: 'Favourites', label: 'Favourites', icon: 'star',     search: true,  action: null,              searchHint: 'Search name, category or tags' },
-  archive:    { title: 'Archive',    label: 'Archive',    icon: 'archive',  search: true,  action: null,              searchHint: 'Search archived links' },
-  trash:      { title: 'Trash',      label: 'Trash',      icon: 'trash',    search: true,  action: null,              searchHint: 'Search deleted links' },
-  settings:   { title: 'Settings',   label: 'Settings',   icon: 'settings', search: false, action: null },
-  adminOverview: { title: 'Admin Dashboard',         label: 'Overview',          icon: 'grid',   search: false, action: null },
-  adminUsers:    { title: 'User Management',         label: 'User Management',   icon: 'user',   search: false, action: null },
-  adminTeams:    { title: 'Teams & Platform Resources', label: 'Teams & Resources', icon: 'box', search: false, action: null }
+  overview: { title: 'Dashboard', label: 'Dashboard', icon: 'grid', search: false, action: null },
+  links: { title: 'My Link', label: 'My Link', icon: 'link', search: true, action: 'Add Link', searchHint: 'Search name, category or tags' },
+  categories: { title: 'Categories', label: 'Categories', icon: 'folder', search: true, action: 'Create Category', searchHint: 'Search categories or folders' },
+  teams: { title: 'Teams', label: 'Teams', icon: 'users', search: true, action: 'Create Team', searchHint: 'Search teams' },
+  favourites: { title: 'Favourites', label: 'Favourites', icon: 'star', search: true, action: null, searchHint: 'Search name, category or tags' },
+  archive: { title: 'Archive', label: 'Archive', icon: 'archive', search: true, action: null, searchHint: 'Search archived links' },
+  trash: { title: 'Trash', label: 'Trash', icon: 'trash', search: true, action: null, searchHint: 'Search deleted links' },
+  settings: { title: 'Settings', label: 'Settings', icon: 'settings', search: false, action: null },
+  adminOverview: { title: 'Admin Dashboard', label: 'Overview', icon: 'grid', search: false, action: null },
+  adminUsers: { title: 'User Management', label: 'User Management', icon: 'user', search: false, action: null },
+  adminTeams: { title: 'Teams & Platform Resources', label: 'Teams & Resources', icon: 'box', search: false, action: null }
 };
 const USER_NAV = ['overview', 'links', 'categories', 'teams', '-', 'favourites', 'archive', 'trash', 'settings'];
 const ADMIN_NAV = ['adminOverview', 'adminUsers', 'adminTeams'];
@@ -94,47 +94,47 @@ function createSampleData() {
     settings: { compact: false, showDescriptions: true, theme: 'light' },
     nextId: 100,                                    // counter for new ids
     users: [
-      { id: 'u1', name: 'Asha Raman',   email: 'asha@example.com',  role: 'User',  status: 'Active',   registered: daysAgo(150) },
-      { id: 'u2', name: 'Ravi Kumar',   email: 'ravi@example.com',  role: 'User',  status: 'Active',   registered: daysAgo(120) },
-      { id: 'u3', name: 'Meena Sundar', email: 'meena@example.com', role: 'User',  status: 'Active',   registered: daysAgo(90) },
+      { id: 'u1', name: 'Asha Raman', email: 'asha@example.com', role: 'User', status: 'Active', registered: daysAgo(150) },
+      { id: 'u2', name: 'Ravi Kumar', email: 'ravi@example.com', role: 'User', status: 'Active', registered: daysAgo(120) },
+      { id: 'u3', name: 'Meena Sundar', email: 'meena@example.com', role: 'User', status: 'Active', registered: daysAgo(90) },
       { id: 'u4', name: 'Karthik Nair', email: 'karthik@example.com', role: 'User', status: 'Disabled', registered: daysAgo(60) },
-      { id: 'u5', name: 'Divya Iyer',   email: 'divya@example.com', role: 'User',  status: 'Active',   registered: daysAgo(20) },
-      { id: 'u6', name: 'Arjun Das',    email: 'arjun@example.com', role: 'User',  status: 'Active',   registered: daysAgo(3) },
+      { id: 'u5', name: 'Divya Iyer', email: 'divya@example.com', role: 'User', status: 'Active', registered: daysAgo(20) },
+      { id: 'u6', name: 'Arjun Das', email: 'arjun@example.com', role: 'User', status: 'Active', registered: daysAgo(3) },
       { id: 'a1', name: 'Platform Admin', email: 'admin@linksphere.demo', role: 'Admin', status: 'Active', registered: daysAgo(300) }
     ],
     teams: [
-      { id: 't1', name: 'Design Club',    description: 'Design systems, UI kits, inspirations and visual assets for creative projects.', members: [{ userId: 'u1', role: 'Manager' }, { userId: 'u3', role: 'Member' }, { userId: 'u5', role: 'Member' }] },
-      { id: 't2', name: 'Study Group',    description: 'Collaborative exam preparation, course notes, timetables and past papers.', members: [{ userId: 'u2', role: 'Manager' }, { userId: 'u1', role: 'Member' }, { userId: 'u4', role: 'Member' }] },
-      { id: 't3', name: 'Marketing Team', description: 'Brand assets, quarterly campaign materials and public promotion resources.', members: [{ userId: 'u6', role: 'Manager' }, { userId: 'u3', role: 'Member' }] }
+      { id: 't1', name: 'Design Club', description: 'Design systems, UI kits, inspirations and visual assets for creative projects.', peoples: [{ userId: 'u1', role: 'leader' }, { userId: 'u3', role: 'people' }, { userId: 'u5', role: 'people' }] },
+      { id: 't2', name: 'Study Group', description: 'Collaborative exam preparation, course notes, timetables and past papers.', peoples: [{ userId: 'u2', role: 'leader' }, { userId: 'u1', role: 'people' }, { userId: 'u4', role: 'people' }] },
+      { id: 't3', name: 'Marketing Team', description: 'Brand assets, quarterly campaign materials and public promotion resources.', peoples: [{ userId: 'u6', role: 'leader' }, { userId: 'u3', role: 'people' }] }
     ],
     // ownerType 'user' = personal category, 'team' = shared category
     categories: [
-      { id: 'c1',  name: 'College',          ownerType: 'user', ownerId: 'u1' },
-      { id: 'c2',  name: 'Work',             ownerType: 'user', ownerId: 'u1' },
-      { id: 'c3',  name: 'Inspiration',      ownerType: 'user', ownerId: 'u1' },
+      { id: 'c1', name: 'College', ownerType: 'user', ownerId: 'u1' },
+      { id: 'c2', name: 'Work', ownerType: 'user', ownerId: 'u1' },
+      { id: 'c3', name: 'Inspiration', ownerType: 'user', ownerId: 'u1' },
       { id: 'c10', name: 'Design Resources', ownerType: 'team', ownerId: 't1' },
-      { id: 'c11', name: 'Exam Prep',        ownerType: 'team', ownerId: 't2' },
-      { id: 'c12', name: 'Campaign Assets',  ownerType: 'team', ownerId: 't3' },
-      { id: 'c13', name: 'Recipes',          ownerType: 'user', ownerId: 'u2' }
+      { id: 'c11', name: 'Exam Prep', ownerType: 'team', ownerId: 't2' },
+      { id: 'c12', name: 'Campaign Assets', ownerType: 'team', ownerId: 't3' },
+      { id: 'c13', name: 'Recipes', ownerType: 'user', ownerId: 'u2' }
     ],
     folders: [
-      { id: 'f1', categoryId: 'c1',  name: 'Semester 5' },
-      { id: 'f2', categoryId: 'c1',  name: 'Assignments' },
-      { id: 'f3', categoryId: 'c2',  name: 'Documentation' },
-      { id: 'f4', categoryId: 'c2',  name: 'Planning' },
+      { id: 'f1', categoryId: 'c1', name: 'Semester 5' },
+      { id: 'f2', categoryId: 'c1', name: 'Assignments' },
+      { id: 'f3', categoryId: 'c2', name: 'Documentation' },
+      { id: 'f4', categoryId: 'c2', name: 'Planning' },
       { id: 'f5', categoryId: 'c10', name: 'UI Kits' },
       { id: 'f6', categoryId: 'c11', name: 'Past Papers' }
     ],
     links: [
-      makeLink({ id: 'l1',  title: 'Semester 5 Notes', url: 'https://example.com/docs/semester-5', description: 'Course notes and reading list', tags: ['study', 'notes', 'exams'], categoryId: 'c1', folderId: 'f1', createdBy: 'u1', health: 'healthy', lastChecked: minsAgo(2), uses: 14, shortCode: 'sem5Kx', createdAt: daysAgo(2) }),
-      makeLink({ id: 'l2',  title: 'MDN Web Docs', url: 'https://developer.mozilla.org', description: 'Reference for HTML, CSS and JavaScript', tags: ['web', 'docs'], categoryId: 'c2', folderId: 'f3', createdBy: 'u1', health: 'healthy', lastChecked: minsAgo(3), uses: 22, createdAt: daysAgo(5) }),
-      makeLink({ id: 'l3',  title: 'Assignment Tracker', url: 'https://example.com/assignments', description: 'Deadlines for this semester', tags: ['study', 'deadlines'], categoryId: 'c1', folderId: 'f2', createdBy: 'u1', health: 'healthy', lastChecked: minsAgo(4), uses: 9, createdAt: daysAgo(3) }),
-      makeLink({ id: 'l4',  title: 'University Portal', url: 'https://portal.example.edu/login', description: 'Student login portal', tags: ['college'], categoryId: 'c1', createdBy: 'u1', health: 'restricted', lastChecked: minsAgo(9), uses: 31, createdAt: daysAgo(20) }),
-      makeLink({ id: 'l5',  title: 'Old Course Page', url: 'https://example.edu/old-course', description: 'Last year\'s course page', tags: ['college', 'archive'], categoryId: 'c1', createdBy: 'u1', health: 'unhealthy', lastChecked: minsAgo(14), uses: 2, createdAt: daysAgo(40) }),
-      makeLink({ id: 'l6',  title: 'GitHub Docs', url: 'https://docs.github.com', description: 'Guides for Git and GitHub', tags: ['git', 'docs'], categoryId: 'c2', folderId: 'f3', createdBy: 'u1', health: 'healthy', lastChecked: minsAgo(6), uses: 17, shortCode: 'gh7Qp2', createdAt: daysAgo(8) }),
-      makeLink({ id: 'l7',  title: 'Project Roadmap', url: 'https://example.com/roadmap', description: 'Quarterly plan', tags: ['planning'], categoryId: 'c2', folderId: 'f4', createdBy: 'u1', health: 'notverified', lastChecked: null, uses: 4, createdAt: daysAgo(1) }),
-      makeLink({ id: 'l8',  title: 'Colour Palette Tool', url: 'https://example.com/palettes', description: 'Pick colours for projects', tags: ['design', 'colour'], categoryId: 'c3', createdBy: 'u1', health: 'healthy', lastChecked: minsAgo(1), uses: 11, createdAt: daysAgo(6) }),
-      makeLink({ id: 'l9',  title: 'Typography Guide', url: 'https://example.com/type-guide-404', description: 'Choosing fonts', tags: ['design', 'fonts'], categoryId: 'c3', createdBy: 'u1', health: 'unhealthy', lastChecked: minsAgo(12), uses: 3, createdAt: daysAgo(9) }),
+      makeLink({ id: 'l1', title: 'Semester 5 Notes', url: 'https://example.com/docs/semester-5', description: 'Course notes and reading list', tags: ['study', 'notes', 'exams'], categoryId: 'c1', folderId: 'f1', createdBy: 'u1', health: 'healthy', lastChecked: minsAgo(2), uses: 14, shortCode: 'sem5Kx', createdAt: daysAgo(2) }),
+      makeLink({ id: 'l2', title: 'MDN Web Docs', url: 'https://developer.mozilla.org', description: 'Reference for HTML, CSS and JavaScript', tags: ['web', 'docs'], categoryId: 'c2', folderId: 'f3', createdBy: 'u1', health: 'healthy', lastChecked: minsAgo(3), uses: 22, createdAt: daysAgo(5) }),
+      makeLink({ id: 'l3', title: 'Assignment Tracker', url: 'https://example.com/assignments', description: 'Deadlines for this semester', tags: ['study', 'deadlines'], categoryId: 'c1', folderId: 'f2', createdBy: 'u1', health: 'healthy', lastChecked: minsAgo(4), uses: 9, createdAt: daysAgo(3) }),
+      makeLink({ id: 'l4', title: 'University Portal', url: 'https://portal.example.edu/login', description: 'Student login portal', tags: ['college'], categoryId: 'c1', createdBy: 'u1', health: 'restricted', lastChecked: minsAgo(9), uses: 31, createdAt: daysAgo(20) }),
+      makeLink({ id: 'l5', title: 'Old Course Page', url: 'https://example.edu/old-course', description: 'Last year\'s course page', tags: ['college', 'archive'], categoryId: 'c1', createdBy: 'u1', health: 'unhealthy', lastChecked: minsAgo(14), uses: 2, createdAt: daysAgo(40) }),
+      makeLink({ id: 'l6', title: 'GitHub Docs', url: 'https://docs.github.com', description: 'Guides for Git and GitHub', tags: ['git', 'docs'], categoryId: 'c2', folderId: 'f3', createdBy: 'u1', health: 'healthy', lastChecked: minsAgo(6), uses: 17, shortCode: 'gh7Qp2', createdAt: daysAgo(8) }),
+      makeLink({ id: 'l7', title: 'Project Roadmap', url: 'https://example.com/roadmap', description: 'Quarterly plan', tags: ['planning'], categoryId: 'c2', folderId: 'f4', createdBy: 'u1', health: 'notverified', lastChecked: null, uses: 4, createdAt: daysAgo(1) }),
+      makeLink({ id: 'l8', title: 'Colour Palette Tool', url: 'https://example.com/palettes', description: 'Pick colours for projects', tags: ['design', 'colour'], categoryId: 'c3', createdBy: 'u1', health: 'healthy', lastChecked: minsAgo(1), uses: 11, createdAt: daysAgo(6) }),
+      makeLink({ id: 'l9', title: 'Typography Guide', url: 'https://example.com/type-guide-404', description: 'Choosing fonts', tags: ['design', 'fonts'], categoryId: 'c3', createdBy: 'u1', health: 'unhealthy', lastChecked: minsAgo(12), uses: 3, createdAt: daysAgo(9) }),
       makeLink({ id: 'l10', title: 'Design Podcast', url: 'https://example.com/podcast', description: 'Weekly design talks', tags: ['design', 'audio'], categoryId: 'c3', createdBy: 'u1', health: 'healthy', lastChecked: minsAgo(5), uses: 6, createdAt: daysAgo(12) }),
       makeLink({ id: 'l11', title: 'Old Timetable', url: 'https://example.com/timetable-2025', description: 'Last year\'s timetable', tags: ['college'], categoryId: 'c1', createdBy: 'u1', state: 'Archived', health: 'healthy', lastChecked: minsAgo(500), createdAt: daysAgo(200) }),
       makeLink({ id: 'l12', title: 'Hackathon Rules', url: 'https://example.com/hackathon', description: 'Event rules', tags: ['event'], categoryId: 'c2', createdBy: 'u1', state: 'Archived', health: 'restricted', lastChecked: minsAgo(700), createdAt: daysAgo(100) }),
@@ -152,7 +152,7 @@ function createSampleData() {
     // Platform activity history for Admin Dashboard
     activity: [
       { id: 'act1', type: 'team', desc: 'Asha Raman created team "Design Club"', timestamp: minsAgo(18) },
-      { id: 'act2', type: 'member', desc: 'Meena Sundar joined "Design Club" as Member', timestamp: minsAgo(45) },
+      { id: 'act2', type: 'people', desc: 'Meena Sundar joined "Design Club" as people', timestamp: minsAgo(45) },
       { id: 'act3', type: 'link', desc: 'Ravi Kumar added shared link "Past Papers 2025"', timestamp: minsAgo(92) },
       { id: 'act4', type: 'health', desc: 'System completed automated link health verification cycle', timestamp: minsAgo(140) },
       { id: 'act5', type: 'user', desc: 'Arjun Das registered a new account', timestamp: daysAgo(3) },
@@ -306,22 +306,22 @@ function categoryById(id) { return data.categories.find(function (c) { return c.
 function folderById(id) { return data.folders.find(function (f) { return f.id === id; }); }
 function linkById(id) { return data.links.find(function (l) { return l.id === id; }); }
 
-// Returns "Manager", "Member" or null for the signed-in user in a team.
+// Returns "leader", "people" or null for the signed-in user in a team.
 function myRole(team) {
   const me = currentUser();
-  const found = team.members.find(function (m) { return m.userId === me.id; });
+  const found = team.peoples.find(function (m) { return m.userId === me.id; });
   return found ? found.role : null;
 }
 // Teams the signed-in user belongs to.
 function myTeams() { return data.teams.filter(function (t) { return myRole(t) !== null; }); }
-// Teams where the signed-in user is Manager.
-function managedTeams() { return data.teams.filter(function (t) { return myRole(t) === 'Manager'; }); }
+// Teams where the signed-in user is leader.
+function managedTeams() { return data.teams.filter(function (t) { return myRole(t) === 'leader'; }); }
 // Teams that a given user belongs to (used by the admin table).
 function teamsOfUser(userId) {
-  return data.teams.filter(function (t) { return t.members.some(function (m) { return m.userId === userId; }); });
+  return data.teams.filter(function (t) { return t.peoples.some(function (m) { return m.userId === userId; }); });
 }
 
-// Can the signed-in user see this link? (personal = owner only, shared = team members)
+// Can the signed-in user see this link? (personal = owner only, shared = team peoples)
 function canSeeLink(link) {
   const me = currentUser();
   const category = categoryById(link.categoryId);
@@ -331,14 +331,14 @@ function canSeeLink(link) {
   return !!team && myRole(team) !== null;
 }
 // Can the signed-in user edit / archive / delete this link?
-// Owner: yes. Team Manager: yes (even other people's links). Plain member: only their own.
+// Owner: yes. Team leader: yes (even other people's links). Plain people: only their own.
 function canManageLink(link) {
   const me = currentUser();
   if (link.createdBy === me.id) { return true; }
   const category = categoryById(link.categoryId);
   if (category && category.ownerType === 'team') {
     const team = teamById(category.ownerId);
-    return !!team && myRole(team) === 'Manager';
+    return !!team && myRole(team) === 'leader';
   }
   return false;
 }
@@ -347,9 +347,9 @@ function canManageCategory(category) {
   const me = currentUser();
   if (category.ownerType === 'user') { return category.ownerId === me.id; }
   const team = teamById(category.ownerId);
-  return !!team && myRole(team) === 'Manager';
+  return !!team && myRole(team) === 'leader';
 }
-// Can the signed-in user add links to this category? (members may add to shared folders)
+// Can the signed-in user add links to this category? (peoples may add to shared folders)
 function canAddToCategory(category) {
   const me = currentUser();
   if (category.ownerType === 'user') { return category.ownerId === me.id; }
@@ -446,10 +446,10 @@ function adminMetrics() {
    --------------------------------------------------------------------- */
 // Predefined demonstration outcomes that "Run Health Check" cycles through.
 const HEALTH_SCRIPT = [
-  { result: 'healthy',    text: 'The link responded successfully (simulated 200 OK).' },
+  { result: 'healthy', text: 'The link responded successfully (simulated 200 OK).' },
   { result: 'restricted', text: 'The site limits automated access (simulated 403). Not counted as a failure.' },
-  { result: 'uncertain',  text: 'The check timed out (simulated). The last known status was kept.' },
-  { result: 'unhealthy',  text: 'A failure was confirmed on every try (simulated 404).' }
+  { result: 'uncertain', text: 'The check timed out (simulated). The last known status was kept.' },
+  { result: 'unhealthy', text: 'A failure was confirmed on every try (simulated 404).' }
 ];
 
 // Instant check used when a link is added, edited or restored: decided by simple words in the URL.
@@ -559,7 +559,7 @@ function closeModal() {
   const submitButton = $('modalSubmit');
   if (submitButton) { submitButton.disabled = false; }
   if (lastActiveElement && typeof lastActiveElement.focus === 'function') {
-    try { lastActiveElement.focus(); } catch (e) {}
+    try { lastActiveElement.focus(); } catch (e) { }
     lastActiveElement = null;
   }
 }
@@ -638,7 +638,7 @@ function navigate(view, filter) {
   const searchInput = $('globalSearch');
   if (searchInput) { searchInput.value = ''; }
   if (window.location && window.location.hash !== '#' + view) {
-    try { history.pushState({ view: view }, '', '#' + view); } catch (e) {}
+    try { history.pushState({ view: view }, '', '#' + view); } catch (e) { }
   }
   render();
   closeMobileMenu();
@@ -847,7 +847,7 @@ function linkCardHtml(link, mode) {
     moreItems += menuItem('healthCheck', link.id, 'Run Health Check (simulated)');
     if (link.shortCode) { moreItems += menuItem('copyShort', link.id, 'Copy Short URL'); }
     if (!canManage) {
-      moreItems += '<div class="menu-note">Shared link: Team member read-only access.</div>';
+      moreItems += '<div class="menu-note">Shared link: Team people read-only access.</div>';
     }
 
     actions =
@@ -860,14 +860,14 @@ function linkCardHtml(link, mode) {
       '<button type="button" class="btn btn-sm" data-action="copyUrl" data-id="' + link.id + '">Copy URL</button>' +
       (canManage
         ? '<button type="button" class="btn btn-sm btn-primary" data-action="restoreLink" data-id="' + link.id + '">Restore</button>' +
-          '<button type="button" class="btn btn-sm btn-danger" data-action="deleteLink" data-id="' + link.id + '">Delete</button>'
+        '<button type="button" class="btn btn-sm btn-danger" data-action="deleteLink" data-id="' + link.id + '">Delete</button>'
         : '<span class="card-meta">Read only</span>');
   } else {
     actions =
       '<button type="button" class="btn btn-sm" data-action="copyUrl" data-id="' + link.id + '">Copy URL</button>' +
       (canManage
         ? '<button type="button" class="btn btn-sm btn-primary" data-action="restoreLink" data-id="' + link.id + '">Restore</button>' +
-          '<button type="button" class="btn btn-sm btn-danger" data-action="purgeLink" data-id="' + link.id + '">Permanently Delete</button>'
+        '<button type="button" class="btn btn-sm btn-danger" data-action="purgeLink" data-id="' + link.id + '">Permanently Delete</button>'
         : '<span class="card-meta">Read only</span>');
   }
 
@@ -991,7 +991,7 @@ function pageCategories() {
     if (canManageCategory(c)) {
       items += menuItem('createFolder', c.id, 'Create Folder') + menuItem('renameCategory', c.id, 'Rename') + menuItem('deleteCategory', c.id, 'Delete', { danger: true });
     } else {
-      items += '<div class="menu-note">Only team Managers can change shared categories.</div>';
+      items += '<div class="menu-note">Only team leaders can change shared categories.</div>';
     }
     return '<article class="glass-card cat-card' + (ui.openMenu === 'cat' + c.id ? ' menu-open' : '') + '"><h3>' + esc(c.name) + '</h3>' +
       '<span class="badge badge-role" style="align-self:flex-start">' + esc(categoryOwnerLabel(c)) + '</span>' +
@@ -1004,7 +1004,7 @@ function pageCategories() {
   html += '<h2 class="section-title" style="margin-top:0">Personal categories</h2>';
   html += personal.length ? '<div class="card-grid">' + personal.map(cardFor).join('') + '</div>' : emptyState('No personal categories', 'Create a category to organise your links.', '<button type="button" class="btn btn-primary" data-action="createCategory">Create Category</button>');
   html += '<h2 class="section-title">Shared categories (from your teams)</h2>';
-  html += shared.length ? '<div class="card-grid">' + shared.map(cardFor).join('') + '</div>' : emptyState('No shared categories', 'Shared categories appear here when a Team Manager creates them.', '');
+  html += shared.length ? '<div class="card-grid">' + shared.map(cardFor).join('') + '</div>' : emptyState('No shared categories', 'Shared categories appear here when a Team leader creates them.', '');
   return html;
 }
 
@@ -1062,7 +1062,7 @@ function pageCategoryDetail() {
       '<button type="button" class="btn btn-sm" data-action="renameCategory" data-id="' + category.id + '">Rename Category</button>' +
       '<button type="button" class="btn btn-sm btn-danger" data-action="deleteCategory" data-id="' + category.id + '">Delete Category</button>';
   } else {
-    html += '<span class="card-meta">Only team Managers can change this shared category.</span>';
+    html += '<span class="card-meta">Only team leaders can change this shared category.</span>';
   }
   html += '</div>';
 
@@ -1089,10 +1089,10 @@ function pageCategoryDetail() {
         '<div class="card-head"><h3>' + icon('folder') + ' ' + esc(f.name) + '</h3></div>' +
         '<p class="cat-stat">' + folderLinks.length + ' link' + (folderLinks.length === 1 ? '' : 's') + '</p>' +
         '<div class="card-actions" style="margin-top:auto;padding-top:8px;">' +
-          '<button type="button" class="btn btn-sm btn-primary" data-action="openFolder" data-id="' + f.id + '" data-category="' + category.id + '">Open</button>' +
-          menuHtml('fld' + f.id, fItems) +
+        '<button type="button" class="btn btn-sm btn-primary" data-action="openFolder" data-id="' + f.id + '" data-category="' + category.id + '">Open</button>' +
+        menuHtml('fld' + f.id, fItems) +
         '</div>' +
-      '</article>';
+        '</article>';
     }).join('') + '</div>';
   }
   html += '</section>';
@@ -1127,89 +1127,89 @@ function pageTeams() {
   }
   return '<div class="card-grid">' + list.map(function (t) {
     const role = myRole(t);
-    const isManager = role === 'Manager';
+    const isleader = role === 'leader';
     const sharedCount = data.categories.filter(function (c) { return c.ownerType === 'team' && c.ownerId === t.id; }).length;
-    const managers = t.members.filter(function (m) { return m.role === 'Manager'; }).map(function (m) { return userName(m.userId); }).join(', ') || 'None';
+    const leaders = t.peoples.filter(function (m) { return m.role === 'leader'; }).map(function (m) { return userName(m.userId); }).join(', ') || 'None';
     let items = '';
-    if (isManager) {
+    if (isleader) {
       items += menuItem('editTeam', t.id, 'Edit Team Details') +
-        menuItem('addMember', t.id, 'Add Member') +
+        menuItem('addpeople', t.id, 'Add people') +
         menuItem('createSharedCategory', t.id, 'Create Shared Category') +
         menuItem('deleteTeam', t.id, 'Delete Team', { danger: true });
     } else {
-      items += '<div class="menu-note">Team Member: Read-only access to team settings.</div>';
+      items += '<div class="menu-note">Team people: Read-only access to team settings.</div>';
     }
     return '<article class="glass-card team-card' + (ui.openMenu === 'team' + t.id ? ' menu-open' : '') + '">' +
       '<div class="card-head"><h3>' + esc(t.name) + '</h3><span class="badge badge-role">Role: ' + role + '</span></div>' +
       (t.description ? '<p class="team-desc">' + esc(t.description) + '</p>' : '<p class="team-desc" style="font-style:italic">No description provided.</p>') +
       '<div class="team-meta">' +
-        '<span><b>' + t.members.length + '</b> member' + (t.members.length === 1 ? '' : 's') + '</span> · ' +
-        '<span><b>' + sharedCount + '</b> shared categor' + (sharedCount === 1 ? 'y' : 'ies') + '</span> · ' +
-        '<span>Manager: <b class="team-managers">' + esc(managers) + '</b></span>' +
+      '<span><b>' + t.peoples.length + '</b> people' + (t.peoples.length === 1 ? '' : 's') + '</span> · ' +
+      '<span><b>' + sharedCount + '</b> shared categor' + (sharedCount === 1 ? 'y' : 'ies') + '</span> · ' +
+      '<span>leader: <b class="team-leaders">' + esc(leaders) + '</b></span>' +
       '</div>' +
       '<div class="card-actions" style="margin-top:auto;padding-top:10px">' +
-        '<button type="button" class="btn btn-sm btn-primary" data-action="viewTeam" data-id="' + t.id + '">View</button>' +
-        (isManager ? '<button type="button" class="btn btn-sm" data-action="addMember" data-id="' + t.id + '">Add Member</button>' : '') +
-        menuHtml('team' + t.id, items) +
+      '<button type="button" class="btn btn-sm btn-primary" data-action="viewTeam" data-id="' + t.id + '">View</button>' +
+      (isleader ? '<button type="button" class="btn btn-sm" data-action="addpeople" data-id="' + t.id + '">Add people</button>' : '') +
+      menuHtml('team' + t.id, items) +
       '</div>' +
-    '</article>';
+      '</article>';
   }).join('') + '</div>';
 }
 
-// PAGE 4b: One team (members, roles, shared categories and folders, shared links)
+// PAGE 4b: One team (peoples, roles, shared categories and folders, shared links)
 function pageTeamDetail() {
   const team = teamById(ui.teamId);
   if (!team || myRole(team) === null) { ui.teamId = null; return pageTeams(); }
   const role = myRole(team);
-  const isManager = role === 'Manager';
-  const managers = team.members.filter(function (m) { return m.role === 'Manager'; }).map(function (m) { return userName(m.userId); }).join(', ') || 'None';
+  const isleader = role === 'leader';
+  const leaders = team.peoples.filter(function (m) { return m.role === 'leader'; }).map(function (m) { return userName(m.userId); }).join(', ') || 'None';
   const sharedCats = data.categories.filter(function (c) { return c.ownerType === 'team' && c.ownerId === team.id; });
   const teamLinks = visibleLinks('Active').filter(function (l) { const c = categoryById(l.categoryId); return c && c.ownerType === 'team' && c.ownerId === team.id; });
 
   let html = '<div class="back-row" style="margin-bottom:var(--space-4);">' +
     '<button type="button" class="btn btn-sm" data-action="backTeams">&larr; Back to Teams</button>' +
     '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
-      '<h2 class="section-title" style="margin:0">' + esc(team.name) + '</h2>' +
-      '<span class="badge badge-role">Your role: ' + role + '</span>' +
+    '<h2 class="section-title" style="margin:0">' + esc(team.name) + '</h2>' +
+    '<span class="badge badge-role">Your role: ' + role + '</span>' +
     '</div>' +
     '<div class="card-actions" style="margin-left:auto">' +
-      (isManager ? '<button type="button" class="btn btn-sm" data-action="editTeam" data-id="' + team.id + '">Edit Team</button>' : '') +
-      (isManager ? '<button type="button" class="btn btn-sm btn-primary" data-action="addMember" data-id="' + team.id + '">Add Member</button>' : '') +
+    (isleader ? '<button type="button" class="btn btn-sm" data-action="editTeam" data-id="' + team.id + '">Edit Team</button>' : '') +
+    (isleader ? '<button type="button" class="btn btn-sm btn-primary" data-action="addpeople" data-id="' + team.id + '">Add people</button>' : '') +
     '</div>' +
-  '</div>';
+    '</div>';
 
   // 1. Team Information / Detail Section
   html += '<section class="glass-panel team-section">' +
     '<div class="panel-title-row"><h3 class="panel-title">Team Information</h3><span class="badge badge-role">Your role: ' + role + '</span></div>' +
     (team.description ? '<p class="team-desc" style="font-size:14px;margin-bottom:12px">' + esc(team.description) + '</p>' : '') +
     '<div class="team-meta" style="font-size:13px;margin-bottom:14px;">' +
-      '<span>Team Manager(s): <b class="team-managers">' + esc(managers) + '</b></span> · ' +
-      '<span>Members: <b>' + team.members.length + '</b></span> · ' +
-      '<span>Shared Categories: <b>' + sharedCats.length + '</b></span> · ' +
-      '<span>Shared Links: <b>' + teamLinks.length + '</b></span>' +
+    '<span>Team leader(s): <b class="team-leaders">' + esc(leaders) + '</b></span> · ' +
+    '<span>peoples: <b>' + team.peoples.length + '</b></span> · ' +
+    '<span>Shared Categories: <b>' + sharedCats.length + '</b></span> · ' +
+    '<span>Shared Links: <b>' + teamLinks.length + '</b></span>' +
     '</div>' +
-    '<div class="note-box" style="margin-bottom:16px;">' + (isManager
-      ? '<b>Manager Permissions Active:</b> You have administrative rights to edit team details, add or remove members, change roles, create shared categories, and manage any shared links in this team.'
-      : '<b>Member Access (Read-Only Management):</b> You can view team resources, contribute new links, and edit your own contributed links. Member management and shared category creation are reserved for Team Managers.') +
+    '<div class="note-box" style="margin-bottom:16px;">' + (isleader
+      ? '<b>leader Permissions Active:</b> You have administrative rights to edit team details, add or remove peoples, change roles, create shared categories, and manage any shared links in this team.'
+      : '<b>people Access (Read-Only Management):</b> You can view team resources, contribute new links, and edit your own contributed links. people management and shared category creation are reserved for Team leaders.') +
     '</div>' +
-    '<div class="panel-title-row"><h4 style="margin:0;font-size:15px;font-weight:600;color:var(--text-strong);">Team Members (' + team.members.length + ')</h4>' +
-    (isManager ? '<button type="button" class="btn btn-sm btn-primary" data-action="addMember" data-id="' + team.id + '">Add Member</button>' : '') +
+    '<div class="panel-title-row"><h4 style="margin:0;font-size:15px;font-weight:600;color:var(--text-strong);">Team peoples (' + team.peoples.length + ')</h4>' +
+    (isleader ? '<button type="button" class="btn btn-sm btn-primary" data-action="addpeople" data-id="' + team.id + '">Add people</button>' : '') +
     '</div>' +
     '<div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Permissions</th><th>Actions</th></tr></thead><tbody>' +
-    team.members.map(function (member) {
-      const user = userById(member.userId);
+    team.peoples.map(function (people) {
+      const user = userById(people.userId);
       const isSelf = user && user.id === currentUser().id;
-      const roleCell = isManager
-        ? '<select class="select" style="width:auto;padding:6px 10px" data-change="changeRole" data-team="' + team.id + '" data-user="' + member.userId + '" aria-label="Role of ' + esc(user ? user.name : 'member') + '">' +
-            '<option value="Manager"' + (member.role === 'Manager' ? ' selected' : '') + '>Manager</option>' +
-            '<option value="Member"' + (member.role === 'Member' ? ' selected' : '') + '>Member</option>' +
-          '</select>'
-        : '<span class="badge badge-role">' + member.role + '</span>';
+      const roleCell = isleader
+        ? '<select class="select" style="width:auto;padding:6px 10px" data-change="changeRole" data-team="' + team.id + '" data-user="' + people.userId + '" aria-label="Role of ' + esc(user ? user.name : 'people') + '">' +
+        '<option value="leader"' + (people.role === 'leader' ? ' selected' : '') + '>leader</option>' +
+        '<option value="people"' + (people.role === 'people' ? ' selected' : '') + '>people</option>' +
+        '</select>'
+        : '<span class="badge badge-role">' + people.role + '</span>';
 
-      const permDesc = member.role === 'Manager' ? 'Full team control' : 'Can view &amp; contribute';
+      const permDesc = people.role === 'leader' ? 'Full team control' : 'Can view &amp; contribute';
 
-      const actionBtn = isManager
-        ? '<button type="button" class="btn btn-sm btn-danger" data-action="removeMember" data-team="' + team.id + '" data-user="' + member.userId + '">Remove' + (isSelf ? ' (Leave)' : '') + '</button>'
+      const actionBtn = isleader
+        ? '<button type="button" class="btn btn-sm btn-danger" data-action="removepeople" data-team="' + team.id + '" data-user="' + people.userId + '">Remove' + (isSelf ? ' (Leave)' : '') + '</button>'
         : '<span class="card-meta">Read-only</span>';
 
       return '<tr>' +
@@ -1218,16 +1218,16 @@ function pageTeamDetail() {
         '<td>' + roleCell + '</td>' +
         '<td><span class="card-meta">' + permDesc + '</span></td>' +
         '<td>' + actionBtn + '</td>' +
-      '</tr>';
+        '</tr>';
     }).join('') + '</tbody></table></div></section>';
 
   // 2. Shared Categories Section
   html += '<section class="glass-panel team-section">' +
     '<div class="panel-title-row"><h3 class="panel-title">Shared Categories (' + sharedCats.length + ')</h3>' +
-    (isManager ? '<button type="button" class="btn btn-sm btn-primary" data-action="createSharedCategory" data-id="' + team.id + '">Create Shared Category</button>' : '') +
+    (isleader ? '<button type="button" class="btn btn-sm btn-primary" data-action="createSharedCategory" data-id="' + team.id + '">Create Shared Category</button>' : '') +
     '</div>';
   if (sharedCats.length === 0) {
-    html += emptyState('No shared categories yet', 'Shared categories allow team members to organise links into common folders.', isManager ? '<button type="button" class="btn btn-sm btn-primary" data-action="createSharedCategory" data-id="' + team.id + '">Create Shared Category</button>' : '');
+    html += emptyState('No shared categories yet', 'Shared categories allow team peoples to organise links into common folders.', isleader ? '<button type="button" class="btn btn-sm btn-primary" data-action="createSharedCategory" data-id="' + team.id + '">Create Shared Category</button>' : '');
   } else {
     html += '<div class="card-grid">' + sharedCats.map(function (c) {
       const folders = data.folders.filter(function (f) { return f.categoryId === c.id; });
@@ -1247,7 +1247,7 @@ function pageTeamDetail() {
     '</div>';
 
   if (teamLinks.length === 0) {
-    html += emptyState('No shared links in this team', 'Team members can save links into shared categories to collaborate.', sharedCats.length > 0 ? '<button type="button" class="btn btn-sm btn-primary" data-action="addLink" data-category="' + sharedCats[0].id + '">Add Link</button>' : '');
+    html += emptyState('No shared links in this team', 'Team peoples can save links into shared categories to collaborate.', sharedCats.length > 0 ? '<button type="button" class="btn btn-sm btn-primary" data-action="addLink" data-category="' + sharedCats[0].id + '">Add Link</button>' : '');
   } else {
     html += cardGrid(filteredLinks, 'active', '<p class="card-meta">No shared links matched your search filter.</p>');
   }
@@ -1374,7 +1374,7 @@ function openMoveForm(link) {
 // Checks the signed-in user may change this link; shows a message if not.
 function allowedToChange(link) {
   if (canManageLink(link)) { return true; }
-  toast('Only the owner or a team Manager can change this link.', true);
+  toast('Only the owner or a team leader can change this link.', true);
   return false;
 }
 
@@ -1456,7 +1456,7 @@ function showShortUrl(linkId) {
             link.shortCode = resData.shortCode || resData.short_code;
             saveData(); render();
           }
-        }).catch(function () {});
+        }).catch(function () { });
     }
     link.shortCode = generateCode();
     created = true;
@@ -1489,13 +1489,13 @@ function openCreateCategory(presetTeamId) {
     ownerOptions += '<option value="team:' + t.id + '"' + (t.id === presetTeamId ? ' selected' : '') + '>Shared with team: ' + esc(t.name) + '</option>';
   });
   const body = '<div class="field"><label for="cat_name">Category name</label><input class="input" id="cat_name" name="name"></div>' +
-    '<div class="field"><label for="cat_owner">Who owns it?</label><select class="select" id="cat_owner" name="owner">' + ownerOptions + '</select><span class="hint">Only team Managers can create shared categories.</span></div>';
+    '<div class="field"><label for="cat_owner">Who owns it?</label><select class="select" id="cat_owner" name="owner">' + ownerOptions + '</select><span class="hint">Only team leaders can create shared categories.</span></div>';
   openModal('Create Category', body, 'Create Category', function (form) {
     const name = String(form.get('name')).trim();
     const parts = String(form.get('owner')).split(':');
     if (name === '') { return 'Please enter a category name.'; }
     if (categoryNameTaken(name, parts[0], parts[1], '')) { return 'That name is already used in this space.'; }
-    if (parts[0] === 'team' && myRole(teamById(parts[1])) !== 'Manager') { return 'Only team Managers can create shared categories.'; }
+    if (parts[0] === 'team' && myRole(teamById(parts[1])) !== 'leader') { return 'Only team leaders can create shared categories.'; }
     data.categories.push({ id: newId('c'), name: name, ownerType: parts[0], ownerId: parts[1] });
     saveData(); render(); toast('Category created.');
   });
@@ -1504,7 +1504,7 @@ function openCreateCategory(presetTeamId) {
 // Rename Category.
 function openRenameCategory(categoryId) {
   const category = categoryById(categoryId);
-  if (!category || !canManageCategory(category)) { toast('Only the owner or a team Manager can rename this category.', true); return; }
+  if (!category || !canManageCategory(category)) { toast('Only the owner or a team leader can rename this category.', true); return; }
   ui.openMenu = null;
   openModal('Rename Category', '<div class="field"><label for="rn">New name</label><input class="input" id="rn" name="name" value="' + esc(category.name) + '"></div>', 'Rename', function (form) {
     const name = String(form.get('name')).trim();
@@ -1518,7 +1518,7 @@ function openRenameCategory(categoryId) {
 // Delete Category: blocked while it still has active links.
 function deleteCategory(categoryId) {
   const category = categoryById(categoryId);
-  if (!category || !canManageCategory(category)) { toast('Only the owner or a team Manager can delete this category.', true); return; }
+  if (!category || !canManageCategory(category)) { toast('Only the owner or a team leader can delete this category.', true); return; }
   ui.openMenu = null;
   const activeCount = data.links.filter(function (l) { return l.categoryId === categoryId && l.state === 'Active'; }).length;
   if (activeCount > 0) { toast('This category still has ' + activeCount + ' active link(s). Move them to another category first.', true); render(); return; }
@@ -1534,7 +1534,7 @@ function deleteCategory(categoryId) {
 // Create Folder inside a category.
 function openCreateFolder(categoryId) {
   const category = categoryById(categoryId);
-  if (!category || !canManageCategory(category)) { toast('Only the owner or a team Manager can create folders here.', true); return; }
+  if (!category || !canManageCategory(category)) { toast('Only the owner or a team leader can create folders here.', true); return; }
   ui.openMenu = null;
   openModal('Create Folder in "' + category.name + '"', '<div class="field"><label for="fo">Folder name</label><input class="input" id="fo" name="name"></div>', 'Create Folder', function (form) {
     const name = String(form.get('name')).trim();
@@ -1549,7 +1549,7 @@ function openCreateFolder(categoryId) {
 function openRenameFolder(folderId) {
   const folder = folderById(folderId);
   const category = folder && categoryById(folder.categoryId);
-  if (!folder || !category || !canManageCategory(category)) { toast('Only the owner or a team Manager can rename folders.', true); return; }
+  if (!folder || !category || !canManageCategory(category)) { toast('Only the owner or a team leader can rename folders.', true); return; }
   openModal('Rename Folder', '<div class="field"><label for="rf">New name</label><input class="input" id="rf" name="name" value="' + esc(folder.name) + '"></div>', 'Rename', function (form) {
     const name = String(form.get('name')).trim();
     if (name === '') { return 'Please enter a name.'; }
@@ -1564,7 +1564,7 @@ function openMoveFolder(folderId) {
   const folder = folderById(folderId);
   const currentCategory = folder && categoryById(folder.categoryId);
   if (!folder || !currentCategory || !canManageCategory(currentCategory)) {
-    toast('Only the owner or a team Manager can move this folder.', true);
+    toast('Only the owner or a team leader can move this folder.', true);
     return;
   }
   ui.openMenu = null;
@@ -1613,7 +1613,7 @@ function openMoveFolder(folderId) {
 function deleteFolder(folderId) {
   const folder = folderById(folderId);
   const category = folder && categoryById(folder.categoryId);
-  if (!folder || !category || !canManageCategory(category)) { toast('Only the owner or a team Manager can delete folders.', true); return; }
+  if (!folder || !category || !canManageCategory(category)) { toast('Only the owner or a team leader can delete folders.', true); return; }
   confirmBox('Delete folder?', 'Delete "<b>' + esc(folder.name) + '</b>"? Its links move up to the category "' + esc(category.name) + '".', 'Delete Folder', function () {
     data.links.forEach(function (l) { if (l.folderId === folderId) { l.folderId = ''; } });
     data.folders = data.folders.filter(function (f) { return f.id !== folderId; });
@@ -1622,12 +1622,12 @@ function deleteFolder(folderId) {
   });
 }
 
-// Create Team: the creator automatically becomes its Manager.
+// Create Team: the creator automatically becomes its leader.
 function openCreateTeam() {
   const body =
     '<div class="field"><label for="tn">Team name <span style="color:var(--bad)">*</span></label><input class="input" id="tn" name="name" placeholder="e.g. Design Club" required><span class="hint">Give your team a clear, recognisable name.</span></div>' +
     '<div class="field"><label for="td">Team description (optional)</label><textarea class="textarea" id="td" name="description" placeholder="What is this team working on?"></textarea><span class="hint">Explain the purpose and resources shared within this team.</span></div>' +
-    '<div class="note-box" style="margin-top:12px;margin-bottom:0"><b>Note:</b> As the creator, you will automatically become the Team Manager.</div>';
+    '<div class="note-box" style="margin-top:12px;margin-bottom:0"><b>Note:</b> As the creator, you will automatically become the Team leader.</div>';
 
   openModal('Create Team', body, 'Create Team', function (form) {
     const name = String(form.get('name') || '').trim();
@@ -1641,19 +1641,19 @@ function openCreateTeam() {
       id: teamId,
       name: name,
       description: description,
-      members: [{ userId: me.id, role: 'Manager' }]
+      peoples: [{ userId: me.id, role: 'leader' }]
     });
     logActivity('team', me.name + ' created team "' + name + '"');
     saveData();
     render();
-    toast('Team "' + name + '" created successfully. You are the Manager.');
+    toast('Team "' + name + '" created successfully. You are the leader.');
   });
 }
 
-// Edit Team details (name and description) - Managers only.
+// Edit Team details (name and description) - leaders only.
 function openEditTeam(teamId) {
   const team = teamById(teamId);
-  if (!team || myRole(team) !== 'Manager') { toast('Only team Managers can edit team settings.', true); return; }
+  if (!team || myRole(team) !== 'leader') { toast('Only team leaders can edit team settings.', true); return; }
   const body =
     '<div class="field"><label for="et_name">Team name <span style="color:var(--bad)">*</span></label><input class="input" id="et_name" name="name" value="' + esc(team.name) + '" required></div>' +
     '<div class="field"><label for="et_desc">Team description</label><textarea class="textarea" id="et_desc" name="description">' + esc(team.description || '') + '</textarea></div>';
@@ -1672,26 +1672,26 @@ function openEditTeam(teamId) {
   });
 }
 
-// Add Member by user selection or email (Managers only).
-function openAddMember(teamId) {
+// Add people by user selection or email (leaders only).
+function openAddpeople(teamId) {
   const team = teamById(teamId);
-  if (!team || myRole(team) !== 'Manager') { toast('Only team Managers can add members.', true); return; }
+  if (!team || myRole(team) !== 'leader') { toast('Only team leaders can add peoples.', true); return; }
   ui.openMenu = null;
-  const currentMemberIds = team.members.map(function (m) { return m.userId; });
-  const availableUsers = data.users.filter(function (u) { return u.role === 'User' && u.status === 'Active' && currentMemberIds.indexOf(u.id) === -1; });
-  
+  const currentpeopleIds = team.peoples.map(function (m) { return m.userId; });
+  const availableUsers = data.users.filter(function (u) { return u.role === 'User' && u.status === 'Active' && currentpeopleIds.indexOf(u.id) === -1; });
+
   let userSelectOptions = '<option value="">-- Choose from registered users --</option>';
   availableUsers.forEach(function (u) {
     userSelectOptions += '<option value="' + esc(u.email) + '">' + esc(u.name) + ' (' + esc(u.email) + ')</option>';
   });
 
   const body =
-    '<div class="field"><label for="am_select">Select a registered user</label><select class="select" id="am_select" name="userSelect" data-change="selectMemberUser">' + userSelectOptions + '</select><span class="hint">Choose an existing active user or type an email below.</span></div>' +
+    '<div class="field"><label for="am_select">Select a registered user</label><select class="select" id="am_select" name="userSelect" data-change="selectpeopleUser">' + userSelectOptions + '</select><span class="hint">Choose an existing active user or type an email below.</span></div>' +
     '<div class="field"><label for="am_email">Or enter user email <span style="color:var(--bad)">*</span></label><input class="input" id="am_email" name="email" placeholder="name@example.com" required></div>' +
-    '<div class="field"><label for="am_role">Assign Team Role</label><select class="select" id="am_role" name="role"><option value="Member">Member (can view and contribute links)</option><option value="Manager">Manager (can manage members and categories)</option></select></div>' +
-    '<div class="note-box" style="margin-top:12px;margin-bottom:0"><b>Permissions:</b> Managers have full control over team members, shared folders, and links. Members can only edit links they personally created.</div>';
+    '<div class="field"><label for="am_role">Assign Team Role</label><select class="select" id="am_role" name="role"><option value="people">people (can view and contribute links)</option><option value="leader">leader (can manage peoples and categories)</option></select></div>' +
+    '<div class="note-box" style="margin-top:12px;margin-bottom:0"><b>Permissions:</b> leaders have full control over team peoples, shared folders, and links. peoples can only edit links they personally created.</div>';
 
-  openModal('Add Member to "' + esc(team.name) + '"', body, 'Add Member', function (form) {
+  openModal('Add people to "' + esc(team.name) + '"', body, 'Add people', function (form) {
     let email = String(form.get('email') || '').trim().toLowerCase();
     const selectedEmail = String(form.get('userSelect') || '').trim().toLowerCase();
     if (selectedEmail && !email) { email = selectedEmail; }
@@ -1699,58 +1699,58 @@ function openAddMember(teamId) {
     if (!isValidEmail(email)) { return 'Please enter a valid email address.'; }
     const user = data.users.find(function (u) { return u.email.toLowerCase() === email; });
     if (!user) { return 'No user found with that email address.'; }
-    if (user.role === 'Admin') { return 'Platform administrators cannot be added as regular team members.'; }
+    if (user.role === 'Admin') { return 'Platform administrators cannot be added as regular team peoples.'; }
     if (user.status === 'Disabled') { return 'That user account is currently disabled.'; }
-    if (team.members.some(function (m) { return m.userId === user.id; })) { return user.name + ' is already a member of this team.'; }
-    const role = form.get('role') || 'Member';
-    team.members.push({ userId: user.id, role: role });
-    logActivity('member', user.name + ' joined team "' + team.name + '" as ' + role);
+    if (team.peoples.some(function (m) { return m.userId === user.id; })) { return user.name + ' is already a people of this team.'; }
+    const role = form.get('role') || 'people';
+    team.peoples.push({ userId: user.id, role: role });
+    logActivity('people', user.name + ' joined team "' + team.name + '" as ' + role);
     saveData();
     render();
     toast(user.name + ' added to team as ' + role + '.');
   });
 }
 
-// Counts how many Managers a team has (a team must always keep one).
-function managerCount(team) { return team.members.filter(function (m) { return m.role === 'Manager'; }).length; }
+// Counts how many leaders a team has (a team must always keep one).
+function leaderCount(team) { return team.peoples.filter(function (m) { return m.role === 'leader'; }).length; }
 
-// Change a member's role (Managers only).
+// Change a people's role (leaders only).
 function changeRole(teamId, userId, newRole) {
   const team = teamById(teamId);
-  if (!team || myRole(team) !== 'Manager') { toast('Only team Managers can change member roles.', true); render(); return; }
-  const member = team.members.find(function (m) { return m.userId === userId; });
-  if (!member) { return; }
-  if (member.role === 'Manager' && newRole === 'Member' && managerCount(team) <= 1) {
-    toast('Cannot demote the only Manager. A team must have at least one Manager.', true);
+  if (!team || myRole(team) !== 'leader') { toast('Only team leaders can change people roles.', true); render(); return; }
+  const people = team.peoples.find(function (m) { return m.userId === userId; });
+  if (!people) { return; }
+  if (people.role === 'leader' && newRole === 'people' && leaderCount(team) <= 1) {
+    toast('Cannot demote the only leader. A team must have at least one leader.', true);
     render();
     return;
   }
-  const oldRole = member.role;
-  member.role = newRole;
+  const oldRole = people.role;
+  people.role = newRole;
   logActivity('role', userName(userId) + '\'s role in "' + team.name + '" changed to ' + newRole);
   saveData();
   render();
   toast(userName(userId) + '\'s role changed from ' + oldRole + ' to ' + newRole + '.');
 }
 
-// Remove a member after confirmation (their personal items are not touched).
-function removeMember(teamId, userId) {
+// Remove a people after confirmation (their personal items are not touched).
+function removepeople(teamId, userId) {
   const team = teamById(teamId);
-  if (!team || myRole(team) !== 'Manager') { toast('Only team Managers can remove members.', true); return; }
-  const member = team.members.find(function (m) { return m.userId === userId; });
-  if (!member) { return; }
-  if (member.role === 'Manager' && managerCount(team) <= 1) {
-    toast('Cannot remove the only Manager. Promote another member before removing.', true);
+  if (!team || myRole(team) !== 'leader') { toast('Only team leaders can remove peoples.', true); return; }
+  const people = team.peoples.find(function (m) { return m.userId === userId; });
+  if (!people) { return; }
+  if (people.role === 'leader' && leaderCount(team) <= 1) {
+    toast('Cannot remove the only leader. Promote another people before removing.', true);
     return;
   }
-  const memberName = userName(userId);
-  confirmBox('Remove member?', 'Are you sure you want to remove <b>' + esc(memberName) + '</b> from "' + esc(team.name) + '"? Their shared and personal items will remain safe.', 'Remove Member', function () {
-    team.members = team.members.filter(function (m) { return m.userId !== userId; });
-    logActivity('member', memberName + ' was removed from team "' + team.name + '"');
+  const peopleName = userName(userId);
+  confirmBox('Remove people?', 'Are you sure you want to remove <b>' + esc(peopleName) + '</b> from "' + esc(team.name) + '"? Their shared and personal items will remain safe.', 'Remove people', function () {
+    team.peoples = team.peoples.filter(function (m) { return m.userId !== userId; });
+    logActivity('people', peopleName + ' was removed from team "' + team.name + '"');
     if (userId === currentUser().id) { ui.teamId = null; }
     saveData();
     render();
-    toast(memberName + ' was removed from the team.');
+    toast(peopleName + ' was removed from the team.');
   });
 }
 
@@ -1764,7 +1764,7 @@ function removeTeamData(teamId) {
 }
 function deleteTeam(teamId) {
   const team = teamById(teamId);
-  if (!team || myRole(team) !== 'Manager') { toast('Only team Managers can delete a team.', true); return; }
+  if (!team || myRole(team) !== 'leader') { toast('Only team leaders can delete a team.', true); return; }
   ui.openMenu = null;
   confirmBox('Delete team?', 'Delete "<b>' + esc(team.name) + '</b>"? Its shared categories and folders are removed and its shared links move to the Trash.', 'Delete Team', function () {
     logActivity('team', currentUser().name + ' deleted team "' + team.name + '"');
@@ -1811,30 +1811,30 @@ function pageAdminOverview() {
     activityFeedHtml = '<div class="activity-feed">' + activities.map(function (act) {
       let iconName = 'bell';
       if (act.type === 'team') { iconName = 'users'; }
-      else if (act.type === 'member' || act.type === 'role') { iconName = 'user'; }
+      else if (act.type === 'people' || act.type === 'role') { iconName = 'user'; }
       else if (act.type === 'link') { iconName = 'link'; }
       else if (act.type === 'health') { iconName = 'check'; }
       return '<div class="activity-feed-item">' +
         '<div class="activity-feed-icon">' + icon(iconName) + '</div>' +
         '<div class="activity-feed-body">' +
-          '<div class="activity-feed-desc">' + esc(act.desc) + '</div>' +
-          '<div class="activity-feed-time">' + timeAgo(act.timestamp) + '</div>' +
+        '<div class="activity-feed-desc">' + esc(act.desc) + '</div>' +
+        '<div class="activity-feed-time">' + timeAgo(act.timestamp) + '</div>' +
         '</div>' +
-      '</div>';
+        '</div>';
     }).join('') + '</div>';
   }
 
   html += '<div class="grid-2">' +
     '<section class="glass-panel">' +
-      '<h2 class="panel-title">Platform Link Health</h2>' +
-      '<div class="donut-wrap">' + donutHtml(m) + legendHtml(m, false) + '</div>' +
-      '<p class="card-meta" style="margin-top:12px">Restricted and Not Verified are monitored states, not system failures.</p>' +
+    '<h2 class="panel-title">Platform Link Health</h2>' +
+    '<div class="donut-wrap">' + donutHtml(m) + legendHtml(m, false) + '</div>' +
+    '<p class="card-meta" style="margin-top:12px">Restricted and Not Verified are monitored states, not system failures.</p>' +
     '</section>' +
     '<section class="glass-panel">' +
-      '<div class="panel-title-row"><h2 class="panel-title">Platform Activity Log</h2><span class="sim-label">Live system log</span></div>' +
-      activityFeedHtml +
+    '<div class="panel-title-row"><h2 class="panel-title">Platform Activity Log</h2><span class="sim-label">Live system log</span></div>' +
+    activityFeedHtml +
     '</section>' +
-  '</div>';
+    '</div>';
   return html;
 }
 
@@ -1859,7 +1859,7 @@ function userRowsHtml() {
   const me = currentUser();
   if (rows.length === 0) { return '<tr><td colspan="7" style="text-align:center;padding:24px">No users matched your filter criteria.</td></tr>'; }
   return rows.map(function (u) {
-    const teams = teamsOfUser(u.id).map(function (t) { const m = t.members.find(function (x) { return x.userId === u.id; }); return esc(t.name) + ' (' + m.role + ')'; }).join(', ') || '-';
+    const teams = teamsOfUser(u.id).map(function (t) { const m = t.peoples.find(function (x) { return x.userId === u.id; }); return esc(t.name) + ' (' + m.role + ')'; }).join(', ') || '-';
     const isSelf = u.id === me.id;
     const toggle = u.status === 'Active'
       ? '<button type="button" class="btn btn-sm" data-action="toggleUser" data-id="' + u.id + '"' + (isSelf ? ' disabled title="You cannot disable your own account"' : '') + '>Disable</button>'
@@ -1878,28 +1878,28 @@ function userMobileCardsHtml() {
   const me = currentUser();
   if (rows.length === 0) { return '<div class="empty-state"><h3>No users found</h3><p>Try adjusting your search query or status filter.</p></div>'; }
   return rows.map(function (u) {
-    const teams = teamsOfUser(u.id).map(function (t) { const m = t.members.find(function (x) { return x.userId === u.id; }); return esc(t.name) + ' (' + m.role + ')'; }).join(', ') || 'No teams';
+    const teams = teamsOfUser(u.id).map(function (t) { const m = t.peoples.find(function (x) { return x.userId === u.id; }); return esc(t.name) + ' (' + m.role + ')'; }).join(', ') || 'No teams';
     const isSelf = u.id === me.id;
     const toggle = u.status === 'Active'
       ? '<button type="button" class="btn btn-sm" data-action="toggleUser" data-id="' + u.id + '"' + (isSelf ? ' disabled' : '') + '>Disable</button>'
       : '<button type="button" class="btn btn-sm" data-action="toggleUser" data-id="' + u.id + '">Enable</button>';
     return '<article class="user-mobile-card">' +
       '<div class="user-card-head">' +
-        '<div><div class="user-card-name">' + esc(u.name) + (isSelf ? ' <span class="badge badge-active" style="font-size:10px">You</span>' : '') + '</div><div class="user-card-email">' + esc(u.email) + '</div></div>' +
-        '<span class="badge badge-' + u.status.toLowerCase() + '">' + u.status + '</span>' +
+      '<div><div class="user-card-name">' + esc(u.name) + (isSelf ? ' <span class="badge badge-active" style="font-size:10px">You</span>' : '') + '</div><div class="user-card-email">' + esc(u.email) + '</div></div>' +
+      '<span class="badge badge-' + u.status.toLowerCase() + '">' + u.status + '</span>' +
       '</div>' +
       '<div class="user-card-meta">' +
-        '<span class="badge badge-role">Role: ' + u.role + '</span>' +
-        '<span class="card-meta">Joined ' + formatDate(u.registered) + '</span>' +
+      '<span class="badge badge-role">Role: ' + u.role + '</span>' +
+      '<span class="card-meta">Joined ' + formatDate(u.registered) + '</span>' +
       '</div>' +
       '<div class="card-meta">Teams: ' + teams + '</div>' +
       '<div class="card-actions" style="margin-top:6px">' +
-        '<button type="button" class="btn btn-sm" data-action="viewUser" data-id="' + u.id + '">View</button>' +
-        '<button type="button" class="btn btn-sm" data-action="editUser" data-id="' + u.id + '">Edit</button>' +
-        toggle +
-        '<button type="button" class="btn btn-sm btn-danger" data-action="deleteUser" data-id="' + u.id + '"' + (isSelf ? ' disabled' : '') + '>Delete</button>' +
+      '<button type="button" class="btn btn-sm" data-action="viewUser" data-id="' + u.id + '">View</button>' +
+      '<button type="button" class="btn btn-sm" data-action="editUser" data-id="' + u.id + '">Edit</button>' +
+      toggle +
+      '<button type="button" class="btn btn-sm btn-danger" data-action="deleteUser" data-id="' + u.id + '"' + (isSelf ? ' disabled' : '') + '>Delete</button>' +
       '</div>' +
-    '</article>';
+      '</article>';
   }).join('');
 }
 
@@ -1925,11 +1925,11 @@ function pageAdminUsers() {
 
   return '<section class="glass-panel">' +
     '<div class="panel-title-row">' +
-      '<h2 class="panel-title">Registered Users</h2>' +
-      '<label class="search-box" style="max-width:300px;height:40px">' +
-        '<span>' + icon('search') + '</span>' +
-        '<input id="userSearch" type="search" placeholder="Filter by name or email" value="' + esc(ui.userSearch) + '" aria-label="Filter users">' +
-      '</label>' +
+    '<h2 class="panel-title">Registered Users</h2>' +
+    '<label class="search-box" style="max-width:300px;height:40px">' +
+    '<span>' + icon('search') + '</span>' +
+    '<input id="userSearch" type="search" placeholder="Filter by name or email" value="' + esc(ui.userSearch) + '" aria-label="Filter users">' +
+    '</label>' +
     '</div>' +
     chipsHtml +
     '<div class="table-wrap desktop-user-table"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Team</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="userRows">' + userRowsHtml() + '</tbody></table></div>' +
@@ -1944,16 +1944,16 @@ function adminTeamRowsHtml() {
   const teams = data.teams.filter(function (t) {
     if (text === '') { return true; }
     const inName = t.name.toLowerCase().indexOf(text) !== -1;
-    const inManager = t.members.some(function (m) { return m.role === 'Manager' && userName(m.userId).toLowerCase().indexOf(text) !== -1; });
-    return inName || inManager;
+    const inleader = t.peoples.some(function (m) { return m.role === 'leader' && userName(m.userId).toLowerCase().indexOf(text) !== -1; });
+    return inName || inleader;
   });
   if (teams.length === 0) { return '<tr><td colspan="6" style="text-align:center;padding:20px">No teams match your search.</td></tr>'; }
   return teams.map(function (t) {
-    const manager = t.members.filter(function (m) { return m.role === 'Manager'; }).map(function (m) { return esc(userName(m.userId)); }).join(', ') || '-';
+    const leader = t.peoples.filter(function (m) { return m.role === 'leader'; }).map(function (m) { return esc(userName(m.userId)); }).join(', ') || '-';
     const catIds = data.categories.filter(function (c) { return c.ownerType === 'team' && c.ownerId === t.id; }).map(function (c) { return c.id; });
     const linkCount = activeLinks.filter(function (l) { return catIds.indexOf(l.categoryId) !== -1; }).length;
     return '<tr><td><b>' + esc(t.name) + '</b>' + (t.description ? '<br><small class="card-meta">' + esc(t.description) + '</small>' : '') + '</td>' +
-      '<td>' + esc(manager) + '</td><td>' + t.members.length + '</td><td>' + catIds.length + '</td><td>' + linkCount + '</td>' +
+      '<td>' + esc(leader) + '</td><td>' + t.peoples.length + '</td><td>' + catIds.length + '</td><td>' + linkCount + '</td>' +
       '<td><div class="row-actions"><button type="button" class="btn btn-sm" data-action="adminViewTeam" data-id="' + t.id + '">View Details</button><button type="button" class="btn btn-sm btn-danger" data-action="adminDeleteTeam" data-id="' + t.id + '">Delete</button></div></td></tr>';
   }).join('');
 }
@@ -1969,8 +1969,8 @@ function pageAdminTeams() {
   ];
   return '<section class="glass-panel" style="margin-bottom:16px">' +
     '<div class="panel-title-row"><h2 class="panel-title">Platform Teams (' + data.teams.length + ')</h2>' +
-    '<label class="search-box" style="max-width:300px;height:40px"><span>' + icon('search') + '</span><input id="adminTeamSearch" type="search" placeholder="Search teams or managers" value="' + esc(ui.adminTeamSearch) + '" aria-label="Search teams"></label></div>' +
-    '<div class="table-wrap"><table><thead><tr><th>Team</th><th>Manager(s)</th><th>Members</th><th>Shared categories</th><th>Active links</th><th>Actions</th></tr></thead><tbody id="adminTeamRows">' + adminTeamRowsHtml() + '</tbody></table></div></section>' +
+    '<label class="search-box" style="max-width:300px;height:40px"><span>' + icon('search') + '</span><input id="adminTeamSearch" type="search" placeholder="Search teams or leaders" value="' + esc(ui.adminTeamSearch) + '" aria-label="Search teams"></label></div>' +
+    '<div class="table-wrap"><table><thead><tr><th>Team</th><th>leader(s)</th><th>peoples</th><th>Shared categories</th><th>Active links</th><th>Actions</th></tr></thead><tbody id="adminTeamRows">' + adminTeamRowsHtml() + '</tbody></table></div></section>' +
     '<section class="glass-panel"><h2 class="panel-title">Platform Resources Breakdown</h2><div class="activity-list">' + resources.map(function (r) { return '<div class="activity-item"><b>' + r[1] + '</b>' + r[0] + '</div>'; }).join('') + '</div><p class="card-meta" style="margin-top:12px">Admins view aggregate resource counts across the entire system. Personal bookmarks remain private.</p></section>';
 }
 
@@ -1982,7 +1982,7 @@ function adminViewUser(userId) {
   const personalCats = data.categories.filter(function (c) { return c.ownerType === 'user' && c.ownerId === u.id; }).length;
   const userTeams = teamsOfUser(u.id);
   const body = '<dl class="kv"><dt>Name</dt><dd>' + esc(u.name) + '</dd><dt>Email</dt><dd>' + esc(u.email) + '</dd><dt>Role</dt><dd>' + u.role + '</dd><dt>Status</dt><dd>' + u.status + '</dd><dt>Registered</dt><dd>' + formatDate(u.registered) + '</dd>' +
-    '<dt>Teams</dt><dd>' + (userTeams.map(function (t) { const m = t.members.find(function (x) { return x.userId === u.id; }); return esc(t.name) + ' (' + (m ? m.role : 'Member') + ')'; }).join(', ') || 'None') + '</dd><dt>Personal categories</dt><dd>' + personalCats + ' (contents private)</dd></dl>';
+    '<dt>Teams</dt><dd>' + (userTeams.map(function (t) { const m = t.peoples.find(function (x) { return x.userId === u.id; }); return esc(t.name) + ' (' + (m ? m.role : 'people') + ')'; }).join(', ') || 'None') + '</dd><dt>Personal categories</dt><dd>' + personalCats + ' (contents private)</dd></dl>';
   openModal('User Details: ' + u.name, body, null, null);
 }
 
@@ -1995,7 +1995,7 @@ function adminEditUser(userId) {
   const teamOptions = '<option value="">None</option>' + data.teams.map(function (t) { return '<option value="' + t.id + '"' + (current.length && current[0].id === t.id ? ' selected' : '') + '>' + esc(t.name) + '</option>'; }).join('');
   const body = '<div class="field"><label for="eu_name">Name</label><input class="input" id="eu_name" name="name" value="' + esc(u.name) + '"></div>' +
     '<div class="field"><label for="eu_role">Role</label><select class="select" id="eu_role" name="role"><option' + (u.role === 'User' ? ' selected' : '') + '>User</option><option' + (u.role === 'Admin' ? ' selected' : '') + '>Admin</option></select></div>' +
-    '<div class="field"><label for="eu_team">Team Assignment</label><select class="select" id="eu_team" name="team">' + teamOptions + '</select><span class="hint">Selecting a team adds the user as Member. Selecting None removes them from all teams.</span></div>';
+    '<div class="field"><label for="eu_team">Team Assignment</label><select class="select" id="eu_team" name="team">' + teamOptions + '</select><span class="hint">Selecting a team adds the user as people. Selecting None removes them from all teams.</span></div>';
   openModal('Edit User: ' + u.name, body, 'Save Changes', function (form) {
     const name = String(form.get('name')).trim();
     if (name === '') { return 'Please enter a name.'; }
@@ -2004,10 +2004,10 @@ function adminEditUser(userId) {
     u.role = form.get('role');
     const teamId = form.get('team');
     if (teamId === '') {
-      data.teams.forEach(function (t) { t.members = t.members.filter(function (m) { return m.userId !== u.id; }); });
+      data.teams.forEach(function (t) { t.peoples = t.peoples.filter(function (m) { return m.userId !== u.id; }); });
     } else {
       const team = teamById(teamId);
-      if (!team.members.some(function (m) { return m.userId === u.id; })) { team.members.push({ userId: u.id, role: 'Member' }); }
+      if (!team.peoples.some(function (m) { return m.userId === u.id; })) { team.peoples.push({ userId: u.id, role: 'people' }); }
     }
     logActivity('user', 'Platform Admin updated user account for ' + u.name);
     saveData(); render(); toast('User updated.');
@@ -2044,7 +2044,7 @@ function adminDeleteUser(userId) {
     data.links = data.links.filter(function (l) { return personalIds.indexOf(l.categoryId) === -1; });
     data.folders = data.folders.filter(function (f) { return personalIds.indexOf(f.categoryId) === -1; });
     data.categories = data.categories.filter(function (c) { return personalIds.indexOf(c.id) === -1; });
-    data.teams.forEach(function (t) { t.members = t.members.filter(function (m) { return m.userId !== u.id; }); });
+    data.teams.forEach(function (t) { t.peoples = t.peoples.filter(function (m) { return m.userId !== u.id; }); });
     delete data.favourites[u.id];
     const deletedName = u.name;
     data.users = data.users.filter(function (x) { return x.id !== u.id; });
@@ -2053,40 +2053,40 @@ function adminDeleteUser(userId) {
   });
 }
 
-// Admin: view a team's members and resources in detail.
+// Admin: view a team's peoples and resources in detail.
 function adminViewTeam(teamId) {
   if (!requireAdmin()) { return; }
   const t = teamById(teamId);
   if (!t) { return; }
-  const managers = t.members.filter(function (m) { return m.role === 'Manager'; }).map(function (m) { return userName(m.userId); }).join(', ') || 'None';
+  const leaders = t.peoples.filter(function (m) { return m.role === 'leader'; }).map(function (m) { return userName(m.userId); }).join(', ') || 'None';
   const sharedCats = data.categories.filter(function (c) { return c.ownerType === 'team' && c.ownerId === t.id; });
   const activeLinks = data.links.filter(function (l) {
     if (l.state !== 'Active') { return false; }
     return sharedCats.some(function (c) { return c.id === l.categoryId; });
   });
 
-  const memberListHtml = t.members.map(function (m) {
+  const peopleListHtml = t.peoples.map(function (m) {
     const u = userById(m.userId);
     return '<li><b>' + esc(u ? u.name : 'Former user') + '</b> (' + esc(u ? u.email : '-') + ') &ndash; <span class="badge badge-role">' + m.role + '</span></li>';
   }).join('');
 
   const catListHtml = sharedCats.length > 0
     ? sharedCats.map(function (c) {
-        const folders = data.folders.filter(function (f) { return f.categoryId === c.id; }).map(function (f) { return f.name; }).join(', ');
-        return '<li><b>' + esc(c.name) + '</b>' + (folders ? ' (Folders: ' + esc(folders) + ')' : '') + '</li>';
-      }).join('')
+      const folders = data.folders.filter(function (f) { return f.categoryId === c.id; }).map(function (f) { return f.name; }).join(', ');
+      return '<li><b>' + esc(c.name) + '</b>' + (folders ? ' (Folders: ' + esc(folders) + ')' : '') + '</li>';
+    }).join('')
     : '<li>No shared categories created yet.</li>';
 
   const body =
     '<dl class="kv">' +
-      '<dt>Team Name</dt><dd>' + esc(t.name) + '</dd>' +
-      '<dt>Description</dt><dd>' + esc(t.description || 'No description provided.') + '</dd>' +
-      '<dt>Manager(s)</dt><dd>' + esc(managers) + '</dd>' +
-      '<dt>Total Members</dt><dd>' + t.members.length + '</dd>' +
-      '<dt>Shared Links</dt><dd>' + activeLinks.length + ' active links</dd>' +
+    '<dt>Team Name</dt><dd>' + esc(t.name) + '</dd>' +
+    '<dt>Description</dt><dd>' + esc(t.description || 'No description provided.') + '</dd>' +
+    '<dt>leader(s)</dt><dd>' + esc(leaders) + '</dd>' +
+    '<dt>Total peoples</dt><dd>' + t.peoples.length + '</dd>' +
+    '<dt>Shared Links</dt><dd>' + activeLinks.length + ' active links</dd>' +
     '</dl>' +
-    '<h3 style="font-size:15px;margin:16px 0 8px;color:var(--text-strong)">Members (' + t.members.length + ')</h3>' +
-    '<ul style="padding-left:18px;margin:0 0 14px;font-size:13px;line-height:1.7">' + memberListHtml + '</ul>' +
+    '<h3 style="font-size:15px;margin:16px 0 8px;color:var(--text-strong)">peoples (' + t.peoples.length + ')</h3>' +
+    '<ul style="padding-left:18px;margin:0 0 14px;font-size:13px;line-height:1.7">' + peopleListHtml + '</ul>' +
     '<h3 style="font-size:15px;margin:16px 0 8px;color:var(--text-strong)">Shared Categories (' + sharedCats.length + ')</h3>' +
     '<ul style="padding-left:18px;margin:0;font-size:13px;line-height:1.7">' + catListHtml + '</ul>';
 
@@ -2344,7 +2344,7 @@ const clickActions = {
     const targetId = d && d.target;
     const el = targetId ? $(targetId) : null;
     if (el) {
-      try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+      try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { }
     }
     const navItems = document.querySelectorAll('.landing-nav-item');
     navItems.forEach(function (item) {
@@ -2361,7 +2361,7 @@ const clickActions = {
     openSignInModal();
   },
   goHome: function () {
-    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { }
   },
   nav: function (d) { navigate(d.view); },
   goto: function (d) {
@@ -2412,8 +2412,8 @@ const clickActions = {
   editTeam: function (d) { ui.openMenu = null; openEditTeam(d.id); },
   viewTeam: function (d) { ui.teamId = d.id; ui.openMenu = null; renderPage(); },
   backTeams: function () { ui.teamId = null; renderPage(); },
-  addMember: function (d) { openAddMember(d.id); },
-  removeMember: function (d) { removeMember(d.team, d.user); },
+  addpeople: function (d) { openAddpeople(d.id); },
+  removepeople: function (d) { removepeople(d.team, d.user); },
   deleteTeam: function (d) { deleteTeam(d.id); },
   createSharedCategory: function (d) { ui.openMenu = null; openCreateCategory(d.id); },
   viewCategoryFromTeam: function (d) { ui.view = 'categories'; ui.categoryId = d.id; ui.folderId = null; ui.teamId = null; render(); },
@@ -2480,7 +2480,7 @@ document.addEventListener('change', function (event) {
   const kind = event.target.dataset.change;
   if (kind === 'changeRole') {
     changeRole(event.target.dataset.team, event.target.dataset.user, event.target.value);
-  } else if (kind === 'selectMemberUser') {
+  } else if (kind === 'selectpeopleUser') {
     const emailField = $('am_email');
     if (emailField && event.target.value) { emailField.value = event.target.value; }
   } else if (kind === 'folderList') {

@@ -4,7 +4,7 @@ import string
 from datetime import datetime
 from functools import wraps
 from flask import session, request, redirect, url_for, jsonify
-from app.models import User, Link, Category, Team, TeamMember
+from app.models import User, Link, Category, Team, Teampeople
 
 def generate_short_code(length=6):
     """Generate a collision-free URL-safe short code."""
@@ -68,18 +68,18 @@ def compute_user_metrics(user):
 
     categories_count = Category.query.filter_by(user_id=user.id).count()
     try:
-        member_team_ids = [m.team_id for m in TeamMember.query.filter((TeamMember.user_id == user.id) | (TeamMember.email == user.email)).all()]
+        people_team_ids = [m.team_id for m in Teampeople.query.filter((Teampeople.user_id == user.id) | (Teampeople.email == user.email)).all()]
         teams_count = Team.query.filter(
-            (Team.manager_id == user.id) | (Team.id.in_(member_team_ids))
+            (Team.leader_id == user.id) | (Team.id.in_(people_team_ids))
         ).distinct().count()
     except Exception:
-        teams_count = Team.query.filter_by(manager_id=user.id).count()
+        teams_count = Team.query.filter_by(leader_id=user.id).count()
 
     try:
-        user_managed_teams = Team.query.filter_by(manager_id=user.id).all()
-        total_members_count = sum(t.members_count for t in user_managed_teams)
+        user_managed_teams = Team.query.filter_by(leader_id=user.id).all()
+        total_peoples_count = sum(t.peoples_count for t in user_managed_teams)
     except Exception:
-        total_members_count = teams_count
+        total_peoples_count = teams_count
 
     favourites_count = Link.query.filter(
         Link.user_id == user.id,
@@ -101,8 +101,8 @@ def compute_user_metrics(user):
         'total_categories': categories_count,
         'teams': teams_count,
         'total_teams': teams_count,
-        'members': total_members_count,
-        'total_members': total_members_count,
+        'peoples': total_peoples_count,
+        'total_peoples': total_peoples_count,
         'shortUrls': short_urls_count,
         'short_urls': short_urls_count,
         'healthy': healthy_count,

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash
 from app.extensions import db
-from app.models import User, Team, Category, Link, TeamMember
+from app.models import User, Team, Category, Link, Teampeople
 from app.helpers import admin_required, compute_admin_metrics, get_current_user
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -53,9 +53,9 @@ def admin_users():
 @admin_required
 def admin_get_user(user_id):
     u = User.query.get_or_404(user_id)
-    user_team_ids = [m.team_id for m in TeamMember.query.filter((TeamMember.user_id == u.id) | (TeamMember.email == u.email)).all()]
-    manager_teams = [t.id for t in Team.query.filter_by(manager_id=u.id).all()]
-    all_user_team_ids = list(set(user_team_ids + manager_teams))
+    user_team_ids = [m.team_id for m in Teampeople.query.filter((Teampeople.user_id == u.id) | (Teampeople.email == u.email)).all()]
+    leader_teams = [t.id for t in Team.query.filter_by(leader_id=u.id).all()]
+    all_user_team_ids = list(set(user_team_ids + leader_teams))
 
     all_teams = [{'id': t.id, 'name': t.name} for t in Team.query.order_by(Team.name.asc()).all()]
 
@@ -97,21 +97,21 @@ def admin_edit_user(user_id):
     if team_id is not None:
         team_id_str = str(team_id).strip()
         if team_id_str == '' or team_id_str == 'none':
-            TeamMember.query.filter((TeamMember.user_id == target_user.id) | (TeamMember.email == target_user.email)).delete()
+            Teampeople.query.filter((Teampeople.user_id == target_user.id) | (Teampeople.email == target_user.email)).delete()
         else:
             try:
                 t_id = int(team_id_str)
                 team = Team.query.get(t_id)
-                if team and team.manager_id != target_user.id:
-                    existing = TeamMember.query.filter_by(team_id=t_id).filter(
-                        (TeamMember.user_id == target_user.id) | (TeamMember.email == target_user.email)
+                if team and team.leader_id != target_user.id:
+                    existing = Teampeople.query.filter_by(team_id=t_id).filter(
+                        (Teampeople.user_id == target_user.id) | (Teampeople.email == target_user.email)
                     ).first()
                     if not existing:
-                        db.session.add(TeamMember(
+                        db.session.add(Teampeople(
                             team_id=t_id,
                             user_id=target_user.id,
                             email=target_user.email,
-                            role='Member'
+                            role='people'
                         ))
             except (ValueError, TypeError):
                 pass
@@ -145,8 +145,8 @@ def admin_delete_user(user_id):
 
     deleted_name = target_user.name
 
-    # Remove user from any team memberships
-    TeamMember.query.filter((TeamMember.user_id == target_user.id) | (TeamMember.email == target_user.email)).delete()
+    # Remove user from any team peopleships
+    Teampeople.query.filter((Teampeople.user_id == target_user.id) | (Teampeople.email == target_user.email)).delete()
 
     db.session.delete(target_user)
     db.session.commit()

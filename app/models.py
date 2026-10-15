@@ -15,7 +15,7 @@ class User(db.Model):
 
     categories = db.relationship('Category', backref='user', lazy=True, cascade='all, delete-orphan')
     links = db.relationship('Link', backref='user', lazy=True, cascade='all, delete-orphan')
-    teams = db.relationship('Team', backref='owner', foreign_keys='Team.manager_id', lazy=True, cascade='all, delete-orphan')
+    teams = db.relationship('Team', backref='owner', foreign_keys='Team.leader_id', lazy=True, cascade='all, delete-orphan')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -54,11 +54,11 @@ class User(db.Model):
     @property
     def teams_label(self):
         try:
-            teams_as_manager = Team.query.filter_by(manager_id=self.id).all()
-            teams_as_member = Team.query.join(TeamMember, TeamMember.team_id == Team.id).filter(
-                (TeamMember.user_id == self.id) | (TeamMember.email == self.email)
+            teams_as_leader = Team.query.filter_by(leader_id=self.id).all()
+            teams_as_people = Team.query.join(Teampeople, Teampeople.team_id == Team.id).filter(
+                (Teampeople.user_id == self.id) | (Teampeople.email == self.email)
             ).all()
-            team_names = list({t.name for t in (teams_as_manager + teams_as_member)})
+            team_names = list({t.name for t in (teams_as_leader + teams_as_people)})
             return ', '.join(sorted(team_names)) if team_names else '-'
         except Exception:
             return '-'
@@ -229,42 +229,42 @@ class Team(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    manager_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    leader_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     @property
-    def manager(self):
+    def leader(self):
         return self.owner
 
     @property
     def owner_id(self):
-        return self.manager_id
+        return self.leader_id
 
     @owner_id.setter
     def owner_id(self, val):
-        self.manager_id = val
+        self.leader_id = val
 
     @property
-    def manager_name(self):
+    def leader_name(self):
         return self.owner.name if self.owner else '-'
 
     @property
-    def managers_label(self):
-        return self.manager_name
+    def leaders_label(self):
+        return self.leader_name
 
     @property
-    def members_list(self):
+    def peoples_list(self):
         try:
-            return TeamMember.query.filter_by(team_id=self.id).order_by(TeamMember.created_at.asc()).all()
+            return Teampeople.query.filter_by(team_id=self.id).order_by(Teampeople.created_at.asc()).all()
         except Exception:
             return []
 
     @property
-    def members_count(self):
+    def peoples_count(self):
         try:
-            other_count = TeamMember.query.filter(
-                TeamMember.team_id == self.id,
-                (TeamMember.user_id != self.manager_id) | (TeamMember.user_id.is_(None))
+            other_count = Teampeople.query.filter(
+                Teampeople.team_id == self.id,
+                (Teampeople.user_id != self.leader_id) | (Teampeople.user_id.is_(None))
             ).count()
             return 1 + other_count
         except Exception:
@@ -284,24 +284,24 @@ class Team(db.Model):
 
     @property
     def user_role(self):
-        return 'Manager'
+        return 'leader'
 
 
-class TeamMember(db.Model):
-    __tablename__ = 'team_members'
+class Teampeople(db.Model):
+    __tablename__ = 'team_peoples'
 
     id = db.Column(db.Integer, primary_key=True)
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id', ondelete='CASCADE'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
     email = db.Column(db.String(120), nullable=False)
-    role = db.Column(db.String(50), default='Member', nullable=False)
+    role = db.Column(db.String(50), default='people', nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('team_memberships', lazy=True, cascade='all, delete-orphan'))
-    team = db.relationship('Team', foreign_keys=[team_id], backref=db.backref('members', lazy=True, cascade='all, delete-orphan'))
+    user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('team_peopleships', lazy=True, cascade='all, delete-orphan'))
+    team = db.relationship('Team', foreign_keys=[team_id], backref=db.backref('peoples', lazy=True, cascade='all, delete-orphan'))
 
     @property
-    def member_name(self):
+    def people_name(self):
         if self.user and self.user.name:
             return self.user.name
         return self.email.split('@')[0]

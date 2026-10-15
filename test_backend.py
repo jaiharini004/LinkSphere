@@ -13,6 +13,7 @@ class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {}
     SECRET_KEY = 'test-secret-key'
 
 test_app = create_app(TestConfig)
@@ -156,7 +157,7 @@ def run_tests():
         res = client.get('/admin/users')
         assert res.status_code == 302
         # 11. Admin Teams and Platform Resources Route
-        test_team = Team(name="Engineering Alpha", manager_id=admin_user.id)
+        test_team = Team(name="Engineering Alpha", leader_id=admin_user.id)
         db.session.add(test_team)
         db.session.commit()
 
@@ -194,19 +195,19 @@ def run_tests():
         assert b"menu-wrap menu-open" not in res.data
         # 14. User Team Detail View (Image 1 Layout)
         res = client.get(f'/teams/{test_team.id}')
-        # Logged in as rahul; test_team manager is admin_user, so create a team for rahul
-        rahul_team = Team(name="Design Club", manager_id=rahul.id)
+        # Logged in as rahul; test_team leader is admin_user, so create a team for rahul
+        rahul_team = Team(name="Design Club", leader_id=rahul.id)
         db.session.add(rahul_team)
         db.session.commit()
 
         res = client.get(f'/teams/{rahul_team.id}')
         assert res.status_code == 200
-        assert b"Manager Permissions Active" in res.data
-        assert b"Team Members (1)" in res.data
+        assert b"leader Permissions Active" in res.data
+        assert b"Team peoples (1)" in res.data
         assert b"Shared Categories (0)" in res.data
         assert b"Shared Links (0)" in res.data
         assert b"Create Shared Category" in res.data
-        assert b"Add Member" in res.data
+        assert b"Add people" in res.data
         assert b"Create Team" in res.data
         print("Test 14 Passed: User team detail view renders exact Image 1 sections.")
 
@@ -363,14 +364,14 @@ def run_tests():
             assert 'X-Invite-Token' in kwargs['headers']
 
             # API route test: rahul invites partner to rahul_team
-            res = client.post(f'/teams/{rahul_team.id}/members', json={
+            res = client.post(f'/teams/{rahul_team.id}/peoples', json={
                 'email': 'teammate@example.com',
-                'role': 'Member'
+                'role': 'people'
             })
             assert res.status_code == 200
             assert res.get_json()['status'] == 'ok'
             assert res.get_json()['webhook_sent'] is True
-        print("Test 20 Passed: n8n team member invitation webhook integration verified.")
+        print("Test 20 Passed: n8n team people invitation webhook integration verified.")
 
         print("\n===========================================")
         print("ALL 20 VERIFICATION SUITES PASSED FLAWLESSLY!")

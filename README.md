@@ -55,7 +55,7 @@ LinkSphere is a centralized platform to bookmark, organize, share, monitor, and 
 
 ### 👥 Team Collaboration & n8n Email Invites
 - **Collaborative Teams**: Create teams and share categories across teammates.
-- **Teammate Invites**: Invite members with customizable roles (*Member* vs *Manager*).
+- **Teammate Invites**: Invite peoples with customizable roles (*people* vs *leader*).
 - **n8n Automation Webhooks**:
   - `send_invitation_email(email, team, role, inviter)` sends payload to `N8N_INVITE_WEBHOOK_URL` authenticated with `X-Invite-Token`.
   - Link creation webhook notification for downstream workflows.
@@ -69,7 +69,7 @@ LinkSphere is a centralized platform to bookmark, organize, share, monitor, and 
 ### 🛡️ Administration Portal
 - **Admin Dashboard (`/admin/dashboard`)**: Platform-wide metrics, link health distributions, and user trends.
 - **User Management (`/admin/users`)**: Search, filter, view details, and activate/deactivate user accounts.
-- **Team Resource Oversight (`/admin/teams`)**: View all teams, managers, member counts, and associated categories.
+- **Team Resource Oversight (`/admin/teams`)**: View all teams, leaders, people counts, and associated categories.
 
 ---
 
@@ -97,7 +97,7 @@ LinkSphere follows the **Application Factory pattern** with modular Flask Bluepr
    - /login          - /dashboard           - /admin/dashboard - /s/<code>
    - /register       - /links (CRUD)        - /admin/users     - Redirect & Click
    - /logout         - /categories & folders- /admin/teams       Tracking
-                     - /teams & members
+                     - /teams & peoples
                      - /favourites, archive
                                |
          +---------------------+---------------------+
@@ -175,7 +175,7 @@ erDiagram
         int id PK
         string name
         text description
-        int manager_id FK
+        int leader_id FK
         datetime created_at
     }
 ```
@@ -340,13 +340,13 @@ python test_backend.py
 11. Admin teams overview & system resource distribution
 12. Custom styled 404 error page rendering
 13. Favourites view & dropdown menus
-14. Team detail view & manager controls
+14. Team detail view & leader controls
 15. Admin search bar layout optimization
 16. Trash soft deletion & 1-click restoration
 17. Category folder workspace, folder creation, link cards in folders, and folder deletion
 18. Favourites toggle API (`POST /links/<id>/favorite`) and view updates
 19. Automatic 5-minute background link health checking & manual verification
-20. n8n team member invitation webhook (`send_invitation_email`) with token authentication
+20. n8n team people invitation webhook (`send_invitation_email`) with token authentication
 
 ---
 
@@ -388,18 +388,18 @@ python test_backend.py
 
 ### Teams & Webhooks
 - `GET, POST /teams` — View user teams or create a new team.
-- `GET /teams/<team_id>` — Team detail workspace with manager controls, shared categories, and links.
+- `GET /teams/<team_id>` — Team detail workspace with leader controls, shared categories, and links.
 - `POST /teams/<team_id>/edit` — Edit team name and description.
 - `POST /teams/<team_id>/delete` — Delete team (owned categories revert to personal).
 - `POST /teams/<team_id>/categories` — Create a category scoped to the team.
-- `POST /teams/<team_id>/members` — Invite teammate by email; triggers `send_invitation_email` to n8n webhook.
+- `POST /teams/<team_id>/peoples` — Invite teammate by email; triggers `send_invitation_email` to n8n webhook.
 - `GET /settings` — User preferences and light/dark theme switch.
 
 ### Administrator Portal
 - `GET /admin/dashboard` — Platform overview, system metrics, and activity charts.
 - `GET /admin/users` — User management directory with search and active/inactive filters.
 - `POST /admin/users/<id>/toggle-status` — Enable or disable a user account.
-- `GET /admin/teams` — Platform team resources and manager directory.
+- `GET /admin/teams` — Platform team resources and leader directory.
 
 ---
 

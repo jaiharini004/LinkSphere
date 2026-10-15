@@ -9,189 +9,216 @@
 
 {% block content %}
 {% if active_team %}
-  <!-- Active Team Details View (Image 1 Layout) -->
-  <div class="back-row" style="margin-bottom:var(--space-4);display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-    <a href="{{ url_for('user.teams') }}" class="btn btn-sm" style="text-decoration:none;">&larr; Back to Teams</a>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <h2 class="section-title" style="margin:0;">{{ active_team.name }}</h2>
-      <span class="badge badge-role">Your role: {{ active_team.user_role | default('Manager') }}</span>
-    </div>
-    <div class="card-actions" style="margin-left:auto;">
-      <button type="button" class="btn btn-sm" data-action="editTeam" data-id="{{ active_team.id }}">Edit Team</button>
-      <button type="button" class="btn btn-sm btn-danger" data-action="deleteTeam" data-id="{{ active_team.id }}">Delete Team</button>
-    </div>
+<!-- Active Team Details View (Image 1 Layout) -->
+<div class="back-row" style="margin-bottom:var(--space-4);display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+  <a href="{{ url_for('user.teams') }}" class="btn btn-sm" style="text-decoration:none;">&larr; Back to Teams</a>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <h2 class="section-title" style="margin:0;">{{ active_team.name }}</h2>
+    <span class="badge badge-role">Your role: {{ active_team.user_role | default('leader') }}</span>
   </div>
-
-  <!-- Manager Permissions Active Notice -->
-  <div class="note-box" style="margin-bottom:16px;">
-    <b>Manager Permissions Active:</b> You have administrative rights to edit team details, add or remove members, change roles, create shared categories, and manage any shared links in this team.
+  <div class="card-actions" style="margin-left:auto;">
+    <button type="button" class="btn btn-sm" data-action="editTeam" data-id="{{ active_team.id }}">Edit Team</button>
+    <button type="button" class="btn btn-sm btn-danger" data-action="deleteTeam" data-id="{{ active_team.id }}">Delete
+      Team</button>
   </div>
+</div>
 
-  <!-- Section 1: Team Members -->
-  <section class="glass-panel team-section" style="margin-bottom:var(--space-5);">
-    <div class="panel-title-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
-      <h3 class="panel-title" style="font-size:16px;font-weight:700;margin:0;">Team Members ({{ active_team.members_count | default(1) }})</h3>
-      <button type="button" class="btn btn-sm btn-primary" data-action="addMember" data-id="{{ active_team.id }}">Add Member</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Permissions</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Manager row -->
-          <tr>
-            <td>
-              <b>{{ active_team.owner.name if active_team.owner else 'Manager' }}</b>
-              {% if active_team.manager_id == current_user.id %}
-              <span class="badge badge-active" style="font-size:10px;margin-left:6px;">You</span>
-              {% endif %}
-            </td>
-            <td>{{ active_team.owner.email if active_team.owner else '-' }}</td>
-            <td><span class="badge badge-role">Manager</span></td>
-            <td><span class="card-meta">Full team control</span></td>
-            <td>
-              {% if active_team.manager_id == current_user.id %}
-              <span class="card-meta">Team Creator</span>
-              {% else %}
-              <span class="card-meta">Manager</span>
-              {% endif %}
-            </td>
-          </tr>
-          <!-- Member rows -->
-          {% if active_team.members_list %}
-            {% for m in active_team.members_list %}
-              {% if m.user_id != active_team.manager_id and m.email != (active_team.owner.email if active_team.owner else '') %}
-              <tr>
-                <td>
-                  <b>{{ m.member_name }}</b>
-                  {% if current_user and (m.user_id == current_user.id or m.email == current_user.email) %}
-                  <span class="badge badge-active" style="font-size:10px;margin-left:6px;">You</span>
-                  {% endif %}
-                </td>
-                <td>{{ m.email }}</td>
-                <td>
-                  {% if is_manager or active_team.manager_id == current_user.id %}
-                  <select class="select" style="width:auto;padding:4px 8px;font-size:13px;" data-change="changeRole" data-team="{{ active_team.id }}" data-member="{{ m.id }}" aria-label="Role of {{ m.member_name }}">
-                    <option value="Manager" {% if m.role == 'Manager' %}selected{% endif %}>Manager</option>
-                    <option value="Member" {% if m.role == 'Member' %}selected{% endif %}>Member</option>
-                  </select>
-                  {% else %}
-                  <span class="badge badge-role">{{ m.role }}</span>
-                  {% endif %}
-                </td>
-                <td><span class="card-meta">{% if m.role == 'Manager' %}Full team control{% else %}Can view & contribute{% endif %}</span></td>
-                <td>
-                  {% if is_manager or active_team.manager_id == current_user.id or (current_user and (m.user_id == current_user.id or m.email == current_user.email)) %}
-                  <button type="button" class="btn btn-sm btn-danger" data-action="removeMember" data-team="{{ active_team.id }}" data-member="{{ m.id }}">Remove{% if current_user and (m.user_id == current_user.id or m.email == current_user.email) %} (Leave){% endif %}</button>
-                  {% else %}
-                  <span class="card-meta">Read-only</span>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-        </tbody>
+<!-- leader Permissions Active Notice -->
+<div class="note-box" style="margin-bottom:16px;">
+  <b>leader Permissions Active:</b> You have administrative rights to edit team details, add or remove peoples, change
+  roles, create shared categories, and manage any shared links in this team.
+</div>
 
-      </table>
-    </div>
-  </section>
-
-  <!-- Section 2: Shared Categories -->
-  <section class="glass-panel team-section" style="margin-bottom:var(--space-5);">
-    <div class="panel-title-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
-      <h3 class="panel-title" style="font-size:16px;font-weight:700;margin:0;">Shared Categories ({{ shared_categories | length }})</h3>
-      <button type="button" class="btn btn-sm btn-primary" data-action="createSharedCategory" data-id="{{ active_team.id }}" data-name="{{ active_team.name }}">Create Shared Category</button>
-    </div>
-
-    {% if shared_categories %}
-      <div class="card-grid">
-        {% for c in shared_categories %}
-          <article class="glass-card cat-card">
-            <h3>{{ c.name }}</h3>
-            <p class="cat-stat">{{ c.active_links_count | default(0) }} active links</p>
-            <div class="card-actions" style="margin-top:auto;padding-top:8px;">
-              <a href="{{ url_for('user.my_links', category_id=c.id) }}" class="btn btn-sm btn-primary" style="text-decoration:none;">Open Category</a>
-              <button type="button" class="btn btn-sm btn-danger" data-action="deleteCategory" data-id="{{ c.id }}">Delete</button>
-            </div>
-          </article>
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="empty-state" style="border: 2px dashed var(--border-soft); border-radius: var(--radius-lg); padding: var(--space-6) var(--space-4); text-align: center;">
-        <h3 style="font-size: 18px; margin-bottom: 8px;">No shared categories yet</h3>
-        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Shared categories allow team members to organise links into common folders.</p>
-        <button type="button" class="btn btn-primary" data-action="createSharedCategory" data-id="{{ active_team.id }}" data-name="{{ active_team.name }}">Create Shared Category</button>
-      </div>
-    {% endif %}
-  </section>
-
-  <!-- Section 3: Shared Links -->
-  <section class="glass-panel team-section">
-    <div class="panel-title-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
-      <h3 class="panel-title" style="font-size:16px;font-weight:700;margin:0;">Shared Links ({{ shared_links | length }})</h3>
-      {% if shared_categories %}
-        <button type="button" class="btn btn-sm btn-primary" data-action="addLink" data-category="{{ shared_categories[0].id }}">Add Link to Team</button>
-      {% endif %}
-    </div>
-
-    {% if shared_links %}
-      <div class="card-grid">
-        {% for link in shared_links %}
-          {{ render_link_card(link, mode='active', can_manage=True) }}
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="empty-state" style="border: 2px dashed var(--border-soft); border-radius: var(--radius-lg); padding: var(--space-6) var(--space-4); text-align: center;">
-        <h3 style="font-size: 18px; margin-bottom: 8px;">No shared links in this team</h3>
-        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Team members can save links into shared categories to collaborate.</p>
-        {% if shared_categories %}
-          <button type="button" class="btn btn-primary" data-action="addLink" data-category="{{ shared_categories[0].id }}">Add Link</button>
-        {% else %}
-          <button type="button" class="btn btn-primary" data-action="createSharedCategory" data-id="{{ active_team.id }}" data-name="{{ active_team.name }}">Create Shared Category First</button>
+<!-- Section 1: Team peoples -->
+<section class="glass-panel team-section" style="margin-bottom:var(--space-5);">
+  <div class="panel-title-row"
+    style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
+    <h3 class="panel-title" style="font-size:16px;font-weight:700;margin:0;">Team peoples ({{ active_team.peoples_count | default(1) }})</h3>
+    <button type="button" class="btn btn-sm btn-primary" data-action="addpeople" data-id="{{ active_team.id }}">Add people</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Permissions</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- leader row -->
+        <tr>
+          <td>
+            <b>{{ active_team.owner.name if active_team.owner else 'leader' }}</b>
+            {% if active_team.leader_id == current_user.id %}
+            <span class="badge badge-active" style="font-size:10px;margin-left:6px;">You</span>
+            {% endif %}
+          </td>
+          <td>{{ active_team.owner.email if active_team.owner else '-' }}</td>
+          <td><span class="badge badge-role">leader</span></td>
+          <td><span class="card-meta">Full team control</span></td>
+          <td>
+            {% if active_team.leader_id == current_user.id %}
+            <span class="card-meta">Team Creator</span>
+            {% else %}
+            <span class="card-meta">leader</span>
+            {% endif %}
+          </td>
+        </tr>
+        <!-- people rows -->
+        {% if active_team.peoples_list %}
+        {% for m in active_team.peoples_list %}
+        {% if m.user_id != active_team.leader_id and m.email != (active_team.owner.email if active_team.owner else '')
+        %}
+        <tr>
+          <td>
+            <b>{{ m.people_name }}</b>
+            {% if current_user and (m.user_id == current_user.id or m.email == current_user.email) %}
+            <span class="badge badge-active" style="font-size:10px;margin-left:6px;">You</span>
+            {% endif %}
+          </td>
+          <td>{{ m.email }}</td>
+          <td>
+            {% if is_leader or active_team.leader_id == current_user.id %}
+            <select class="select" style="width:auto;padding:4px 8px;font-size:13px;" data-change="changeRole"
+              data-team="{{ active_team.id }}" data-people="{{ m.id }}" aria-label="Role of {{ m.people_name }}">
+              <option value="leader" {% if m.role=='leader' %}selected{% endif %}>leader</option>
+              <option value="people" {% if m.role=='people' %}selected{% endif %}>people</option>
+            </select>
+            {% else %}
+            <span class="badge badge-role">{{ m.role }}</span>
+            {% endif %}
+          </td>
+          <td><span class="card-meta">{% if m.role == 'leader' %}Full team control{% else %}Can view & contribute{%
+              endif %}</span></td>
+          <td>
+            {% if is_leader or active_team.leader_id == current_user.id or (current_user and (m.user_id ==
+            current_user.id or m.email == current_user.email)) %}
+            <button type="button" class="btn btn-sm btn-danger" data-action="removepeople"
+              data-team="{{ active_team.id }}" data-people="{{ m.id }}">Remove{% if current_user and (m.user_id ==
+              current_user.id or m.email == current_user.email) %} (Leave){% endif %}</button>
+            {% else %}
+            <span class="card-meta">Read-only</span>
+            {% endif %}
+          </td>
+        </tr>
         {% endif %}
+        {% endfor %}
+        {% endif %}
+      </tbody>
+
+    </table>
+  </div>
+</section>
+
+<!-- Section 2: Shared Categories -->
+<section class="glass-panel team-section" style="margin-bottom:var(--space-5);">
+  <div class="panel-title-row"
+    style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
+    <h3 class="panel-title" style="font-size:16px;font-weight:700;margin:0;">Shared Categories ({{ shared_categories |
+      length }})</h3>
+    <button type="button" class="btn btn-sm btn-primary" data-action="createSharedCategory"
+      data-id="{{ active_team.id }}" data-name="{{ active_team.name }}">Create Shared Category</button>
+  </div>
+
+  {% if shared_categories %}
+  <div class="card-grid">
+    {% for c in shared_categories %}
+    <article class="glass-card cat-card">
+      <h3>{{ c.name }}</h3>
+      <p class="cat-stat">{{ c.active_links_count | default(0) }} active links</p>
+      <div class="card-actions" style="margin-top:auto;padding-top:8px;">
+        <a href="{{ url_for('user.my_links', category_id=c.id) }}" class="btn btn-sm btn-primary"
+          style="text-decoration:none;">Open Category</a>
+        <button type="button" class="btn btn-sm btn-danger" data-action="deleteCategory"
+          data-id="{{ c.id }}">Delete</button>
       </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state"
+    style="border: 2px dashed var(--border-soft); border-radius: var(--radius-lg); padding: var(--space-6) var(--space-4); text-align: center;">
+    <h3 style="font-size: 18px; margin-bottom: 8px;">No shared categories yet</h3>
+    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Shared categories allow team peoples to
+      organise links into common folders.</p>
+    <button type="button" class="btn btn-primary" data-action="createSharedCategory" data-id="{{ active_team.id }}"
+      data-name="{{ active_team.name }}">Create Shared Category</button>
+  </div>
+  {% endif %}
+</section>
+
+<!-- Section 3: Shared Links -->
+<section class="glass-panel team-section">
+  <div class="panel-title-row"
+    style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
+    <h3 class="panel-title" style="font-size:16px;font-weight:700;margin:0;">Shared Links ({{ shared_links | length }})
+    </h3>
+    {% if shared_categories %}
+    <button type="button" class="btn btn-sm btn-primary" data-action="addLink"
+      data-category="{{ shared_categories[0].id }}">Add Link to Team</button>
     {% endif %}
-  </section>
+  </div>
+
+  {% if shared_links %}
+  <div class="card-grid">
+    {% for link in shared_links %}
+    {{ render_link_card(link, mode='active', can_manage=True) }}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state"
+    style="border: 2px dashed var(--border-soft); border-radius: var(--radius-lg); padding: var(--space-6) var(--space-4); text-align: center;">
+    <h3 style="font-size: 18px; margin-bottom: 8px;">No shared links in this team</h3>
+    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Team peoples can save links into shared
+      categories to collaborate.</p>
+    {% if shared_categories %}
+    <button type="button" class="btn btn-primary" data-action="addLink"
+      data-category="{{ shared_categories[0].id }}">Add Link</button>
+    {% else %}
+    <button type="button" class="btn btn-primary" data-action="createSharedCategory" data-id="{{ active_team.id }}"
+      data-name="{{ active_team.name }}">Create Shared Category First</button>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
 
 {% else %}
-  <!-- Teams Cards Overview -->
-  {% if teams %}
-    <div class="card-grid">
-      {% for team in teams %}
-        <article class="glass-card team-card">
-          <div class="team-card-head" style="display:flex;justify-content:space-between;align-items:center;">
-            <h3>{{ team.name }}</h3>
-            <span class="badge badge-role">Role: {{ team.user_role | default('Manager') }}</span>
-          </div>
-          <p class="team-desc">{{ team.description | default('Collaborative space for shared links and resources.') }}</p>
-          <div class="team-meta">
-            <span><b>{{ team.members_count | default(1) }}</b> member{% if team.members_count != 1 %}s{% endif %}</span> ·
-            <span><b>{{ team.shared_categories_count | default(0) }}</b> shared categories</span> ·
-            <span>Manager: <b class="team-managers">{{ team.managers_label | default(team.manager_name | default('-')) }}</b></span>
-          </div>
-          <div class="card-actions" style="margin-top:auto;padding-top:10px;">
-            <a href="{{ url_for('user.teams', team_id=team.id) }}" class="btn btn-sm btn-primary" data-action="viewTeam" data-id="{{ team.id }}" style="text-decoration:none;">View</a>
-            <button type="button" class="btn btn-sm" data-action="addMember" data-id="{{ team.id }}">Add Member</button>
-            <button type="button" class="btn btn-sm" data-action="editTeam" data-id="{{ team.id }}">Edit</button>
-            <button type="button" class="btn btn-sm btn-danger" data-action="deleteTeam" data-id="{{ team.id }}">Delete</button>
-          </div>
-        </article>
-      {% endfor %}
+<!-- Teams Cards Overview -->
+{% if teams %}
+<div class="card-grid">
+  {% for team in teams %}
+  <article class="glass-card team-card">
+    <div class="team-card-head" style="display:flex;justify-content:space-between;align-items:center;">
+      <h3>{{ team.name }}</h3>
+      <span class="badge badge-role">Role: {{ team.user_role | default('leader') }}</span>
     </div>
-  {% else %}
-    <div class="empty-state">
-      <h3>No teams found</h3>
-      <p>Create a team - you become its Manager and can invite teammates.</p>
-      <button type="button" class="btn btn-primary" data-action="createTeam">Create Team</button>
+    <p class="team-desc">{{ team.description | default('Collaborative space for shared links and resources.') }}</p>
+    <div class="team-meta">
+      <span><b>{{ team.peoples_count | default(1) }}</b> people{% if team.peoples_count != 1 %}s{% endif %}</span> ·
+      <span><b>{{ team.shared_categories_count | default(0) }}</b> shared categories</span> ·
+      <span>leader: <b class="team-leaders">{{ team.leaders_label | default(team.leader_name | default('-'))
+          }}</b></span>
     </div>
-  {% endif %}
+    <div class="card-actions" style="margin-top:auto;padding-top:10px;">
+      <a href="{{ url_for('user.teams', team_id=team.id) }}" class="btn btn-sm btn-primary" data-action="viewTeam"
+        data-id="{{ team.id }}" style="text-decoration:none;">View</a>
+      <button type="button" class="btn btn-sm" data-action="addpeople" data-id="{{ team.id }}">Add people</button>
+      <button type="button" class="btn btn-sm" data-action="editTeam" data-id="{{ team.id }}">Edit</button>
+      <button type="button" class="btn btn-sm btn-danger" data-action="deleteTeam"
+        data-id="{{ team.id }}">Delete</button>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <h3>No teams found</h3>
+  <p>Create a team - you become its leader and can invite teammates.</p>
+  <button type="button" class="btn btn-primary" data-action="createTeam">Create Team</button>
+</div>
+{% endif %}
 {% endif %}
 {% endblock %}

@@ -5,28 +5,37 @@
   <div class="card-head" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
     <h3 class="card-title" style="flex:1;margin:0;">{{ link.title }}</h3>
     {% if mode == 'active' %}
-    <button type="button" class="btn-icon star-btn" data-action="toggleFavourite" data-id="{{ link.id }}" aria-label="{{ 'Remove from favorites' if fav else 'Add to favorites' }}" title="{{ 'Remove from favorites' if fav else 'Add to favorites' }}" style="background:none;border:none;cursor:pointer;padding:2px 4px;color:{% if fav %}#f59e0b{% else %}rgba(255,255,255,0.35){% endif %};line-height:0;display:inline-flex;align-items:center;transition:color 0.2s, transform 0.15s;flex-shrink:0;">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="{% if fav %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><path d="M12 3.5l2.7 5.5 6 .9-4.4 4.2 1 6-5.3-2.8-5.3 2.8 1-6L3.3 9.9l6-.9z"/></svg>
+    <button type="button" class="btn-icon star-btn" data-action="toggleFavourite" data-id="{{ link.id }}"
+      aria-label="{{ 'Remove from favorites' if fav else 'Add to favorites' }}"
+      title="{{ 'Remove from favorites' if fav else 'Add to favorites' }}"
+      style="background:none;border:none;cursor:pointer;padding:2px 4px;color:{% if fav %}#f59e0b{% else %}rgba(255,255,255,0.35){% endif %};line-height:0;display:inline-flex;align-items:center;transition:color 0.2s, transform 0.15s;flex-shrink:0;">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="{% if fav %}currentColor{% else %}none{% endif %}"
+        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+        style="width:20px;height:20px;">
+        <path d="M12 3.5l2.7 5.5 6 .9-4.4 4.2 1 6-5.3-2.8-5.3 2.8 1-6L3.3 9.9l6-.9z" />
+      </svg>
     </button>
     {% endif %}
   </div>
 
-  <a class="card-url" href="{{ link.url }}" target="_blank" rel="noopener noreferrer" data-action="openLink" data-id="{{ link.id }}">{{ link.url }}</a>
+  <a class="card-url" href="{{ link.url }}" target="_blank" rel="noopener noreferrer" data-action="openLink"
+    data-id="{{ link.id }}">{{ link.url }}</a>
 
   {% if link.description %}
-    <p class="card-desc">{{ link.description }}</p>
+  <p class="card-desc">{{ link.description }}</p>
   {% endif %}
 
   {% if link.tags %}
-    <div class="tag-row">
-      {% for tag in link.tags %}
-        <span class="tag">#{{ tag }}</span>
-      {% endfor %}
-    </div>
+  <div class="tag-row">
+    {% for tag in link.tags %}
+    <span class="tag">#{{ tag }}</span>
+    {% endfor %}
+  </div>
   {% endif %}
 
   <div class="card-meta">
-    Category: {{ link.category_name | default('No category') }}{% if link.folder_name %} &gt; {{ link.folder_name }}{% endif %}<br>
+    Category: {{ link.category_name | default('No category') }}{% if link.folder_name %} &gt; {{ link.folder_name }}{%
+    endif %}<br>
     {{ link.owner_label | default('Personal') }}
   </div>
 
@@ -44,56 +53,78 @@
 
     <div class="card-actions">
       {% if mode == 'active' %}
-        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" data-action="openLink" data-id="{{ link.id }}" title="Open destination in new tab" style="text-decoration:none;">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
-          Open
-        </a>
-        <button type="button" class="btn btn-sm" data-action="copyUrl" data-url="{{ link.url }}" data-id="{{ link.id }}" title="Copy original URL">Copy URL</button>
+      <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary"
+        data-action="openLink" data-id="{{ link.id }}" title="Open destination in new tab"
+        style="text-decoration:none;">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
+          <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
+        </svg>
+        Open
+      </a>
+      <button type="button" class="btn btn-sm" data-action="copyUrl" data-url="{{ link.url }}" data-id="{{ link.id }}"
+        title="Copy original URL">Copy URL</button>
 
-        <div class="menu-wrap">
-          <button type="button" class="btn btn-sm" data-action="toggleMenu" data-key="{{ link.id }}" aria-haspopup="true">
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
-            More
+      <div class="menu-wrap">
+        <button type="button" class="btn btn-sm" data-action="toggleMenu" data-key="{{ link.id }}" aria-haspopup="true">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5" cy="12" r="1.5" />
+            <circle cx="12" cy="12" r="1.5" />
+            <circle cx="19" cy="12" r="1.5" />
+          </svg>
+          More
+        </button>
+        <div class="menu" role="menu">
+          {% if can_manage %}
+          <button type="button" role="menuitem" data-action="editLink" data-id="{{ link.id }}">Edit</button>
+          {% endif %}
+          <button type="button" role="menuitem" data-action="toggleFavourite" data-id="{{ link.id }}">
+            {{ 'Remove from Favorites' if fav else 'Favorite' }}
           </button>
-          <div class="menu" role="menu">
-            {% if can_manage %}
-              <button type="button" role="menuitem" data-action="editLink" data-id="{{ link.id }}">Edit</button>
-            {% endif %}
-            <button type="button" role="menuitem" data-action="toggleFavourite" data-id="{{ link.id }}">
-              {{ 'Remove from Favorites' if fav else 'Favorite' }}
-            </button>
-            {% if can_manage %}
-              <button type="button" role="menuitem" data-action="moveLink" data-id="{{ link.id }}">Move to folder / category</button>
-              <button type="button" role="menuitem" data-action="archiveLink" data-id="{{ link.id }}">Archive</button>
-              <button type="button" role="menuitem" class="danger" data-action="deleteLink" data-id="{{ link.id }}">Delete</button>
-            {% endif %}
-            <button type="button" role="menuitem" data-action="shortUrl" data-id="{{ link.id }}">
-              {{ 'Short URL' if link.short_code else 'Generate Short URL' }}
-            </button>
-            <button type="button" role="menuitem" data-action="healthCheck" data-id="{{ link.id }}">Run Health Check</button>
-            {% if link.short_code %}
-              <button type="button" role="menuitem" data-action="copyShort" data-id="{{ link.id }}">Copy Short URL</button>
-            {% endif %}
-            {% if not can_manage %}
-              <div class="menu-note">Shared link: Team member read-only access.</div>
-            {% endif %}
-          </div>
+          {% if can_manage %}
+          <button type="button" role="menuitem" data-action="moveLink" data-id="{{ link.id }}">Move to folder /
+            category</button>
+          <button type="button" role="menuitem" data-action="archiveLink" data-id="{{ link.id }}">Archive</button>
+          <button type="button" role="menuitem" class="danger" data-action="deleteLink"
+            data-id="{{ link.id }}">Delete</button>
+          {% endif %}
+          <button type="button" role="menuitem" data-action="shortUrl" data-id="{{ link.id }}">
+            {{ 'Short URL' if link.short_code else 'Generate Short URL' }}
+          </button>
+          <button type="button" role="menuitem" data-action="healthCheck" data-id="{{ link.id }}">Run Health
+            Check</button>
+          {% if link.short_code %}
+          <button type="button" role="menuitem" data-action="copyShort" data-id="{{ link.id }}">Copy Short URL</button>
+          {% endif %}
+          {% if not can_manage %}
+          <div class="menu-note">Shared link: Team people read-only access.</div>
+          {% endif %}
         </div>
+      </div>
 
       {% elif mode == 'archive' %}
-        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="text-decoration:none;">Open</a>
-        <button type="button" class="btn btn-sm" data-action="copyUrl" data-url="{{ link.url }}" data-id="{{ link.id }}">Copy URL</button>
-        {% if can_manage %}
-          <button type="button" class="btn btn-sm btn-primary" data-action="restoreLink" data-id="{{ link.id }}">Restore</button>
-          <button type="button" class="btn btn-sm btn-danger" data-action="deleteLink" data-id="{{ link.id }}">Delete</button>
-        {% endif %}
+      <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm"
+        style="text-decoration:none;">Open</a>
+      <button type="button" class="btn btn-sm" data-action="copyUrl" data-url="{{ link.url }}"
+        data-id="{{ link.id }}">Copy URL</button>
+      {% if can_manage %}
+      <button type="button" class="btn btn-sm btn-primary" data-action="restoreLink"
+        data-id="{{ link.id }}">Restore</button>
+      <button type="button" class="btn btn-sm btn-danger" data-action="deleteLink"
+        data-id="{{ link.id }}">Delete</button>
+      {% endif %}
 
       {% else %}
-        <button type="button" class="btn btn-sm" data-action="copyUrl" data-url="{{ link.url }}" data-id="{{ link.id }}">Copy URL</button>
-        {% if can_manage %}
-          <button type="button" class="btn btn-sm btn-primary" data-action="restoreLink" data-id="{{ link.id }}">Restore</button>
-          <button type="button" class="btn btn-sm btn-danger" data-action="purgeLink" data-id="{{ link.id }}">Permanently Delete</button>
-        {% endif %}
+      <button type="button" class="btn btn-sm" data-action="copyUrl" data-url="{{ link.url }}"
+        data-id="{{ link.id }}">Copy URL</button>
+      {% if can_manage %}
+      <button type="button" class="btn btn-sm btn-primary" data-action="restoreLink"
+        data-id="{{ link.id }}">Restore</button>
+      <button type="button" class="btn btn-sm btn-danger" data-action="purgeLink" data-id="{{ link.id }}">Permanently
+        Delete</button>
+      {% endif %}
       {% endif %}
     </div>
   </div>

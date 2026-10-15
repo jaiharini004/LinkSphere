@@ -7,8 +7,8 @@
 function openCreateCategoryModal() {
   const bodyHtml =
     '<div class="field">' +
-      '<label for="m_cat_name">Category Name *</label>' +
-      '<input class="input" id="m_cat_name" name="name" placeholder="e.g. Work, College, or Tech" required>' +
+    '<label for="m_cat_name">Category Name *</label>' +
+    '<input class="input" id="m_cat_name" name="name" placeholder="e.g. Work, College, or Tech" required>' +
     '</div>';
 
   openModal('Create Category', bodyHtml, 'Create Category', function (form) {
@@ -56,8 +56,8 @@ function deleteCategory(categoryId) {
 function openRenameCategoryModal(categoryId, currentName) {
   const bodyHtml =
     '<div class="field">' +
-      '<label for="m_rename_cat">Category Name *</label>' +
-      '<input class="input" id="m_rename_cat" name="name" value="' + esc(currentName || '') + '" required>' +
+    '<label for="m_rename_cat">Category Name *</label>' +
+    '<input class="input" id="m_rename_cat" name="name" value="' + esc(currentName || '') + '" required>' +
     '</div>';
 
   openModal('Rename Category', bodyHtml, 'Save Name', function (form) {
@@ -91,8 +91,8 @@ function openCreateFolderModal(categoryId) {
   }
   const bodyHtml =
     '<div class="field">' +
-      '<label for="m_folder_name">Folder Name *</label>' +
-      '<input class="input" id="m_folder_name" name="name" placeholder="e.g. Design Assets, Research, API Docs" required>' +
+    '<label for="m_folder_name">Folder Name *</label>' +
+    '<input class="input" id="m_folder_name" name="name" placeholder="e.g. Design Assets, Research, API Docs" required>' +
     '</div>';
 
   openModal('Create Folder', bodyHtml, 'Create Folder', function (form) {
@@ -122,8 +122,8 @@ function openCreateFolderModal(categoryId) {
 function openRenameFolderModal(folderId, currentName) {
   const bodyHtml =
     '<div class="field">' +
-      '<label for="m_rename_folder">Folder Name *</label>' +
-      '<input class="input" id="m_rename_folder" name="name" value="' + esc(currentName || '') + '" required>' +
+    '<label for="m_rename_folder">Folder Name *</label>' +
+    '<input class="input" id="m_rename_folder" name="name" value="' + esc(currentName || '') + '" required>' +
     '</div>';
 
   openModal('Rename Folder', bodyHtml, 'Save Name', function (form) {
@@ -173,12 +173,12 @@ function deleteFolderAction(folderId, categoryId) {
 function openCreateTeamModal() {
   const bodyHtml =
     '<div class="field">' +
-      '<label for="m_team_name">Team Name *</label>' +
-      '<input class="input" id="m_team_name" name="name" placeholder="e.g. Design Club or Study Group" required>' +
+    '<label for="m_team_name">Team Name *</label>' +
+    '<input class="input" id="m_team_name" name="name" placeholder="e.g. Design Club or Study Group" required>' +
     '</div>' +
     '<div class="field">' +
-      '<label for="m_team_desc">Description (optional)</label>' +
-      '<textarea class="input" id="m_team_desc" name="description" placeholder="Collaborative space for shared links" rows="2"></textarea>' +
+    '<label for="m_team_desc">Description (optional)</label>' +
+    '<textarea class="input" id="m_team_desc" name="description" placeholder="Collaborative space for shared links" rows="2"></textarea>' +
     '</div>';
 
   openModal('Create Team', bodyHtml, 'Create Team', function (form) {
@@ -216,12 +216,12 @@ function openEditTeamModal(teamId) {
 
   const bodyHtml =
     '<div class="field">' +
-      '<label for="m_edit_team_name">Team Name *</label>' +
-      '<input class="input" id="m_edit_team_name" name="name" value="' + esc(currentName) + '" required>' +
+    '<label for="m_edit_team_name">Team Name *</label>' +
+    '<input class="input" id="m_edit_team_name" name="name" value="' + esc(currentName) + '" required>' +
     '</div>' +
     '<div class="field">' +
-      '<label for="m_edit_team_desc">Description</label>' +
-      '<textarea class="input" id="m_edit_team_desc" name="description" rows="2" placeholder="Team description"></textarea>' +
+    '<label for="m_edit_team_desc">Description</label>' +
+    '<textarea class="input" id="m_edit_team_desc" name="description" rows="2" placeholder="Team description"></textarea>' +
     '</div>';
 
   openModal('Edit Team Details', bodyHtml, 'Save Changes', function (form) {
@@ -270,10 +270,10 @@ function deleteTeam(teamId) {
 function openCreateSharedCategoryModal(teamId, teamName) {
   const bodyHtml =
     '<div class="field">' +
-      '<label for="m_shared_cat_name">Category Name *</label>' +
-      '<input class="input" id="m_shared_cat_name" name="name" placeholder="e.g. Design Assets, Research" required>' +
+    '<label for="m_shared_cat_name">Category Name *</label>' +
+    '<input class="input" id="m_shared_cat_name" name="name" placeholder="e.g. Design Assets, Research" required>' +
     '</div>' +
-    '<p class="card-meta">This category will be shared with all members of <b>' + esc(teamName || 'this team') + '</b>.</p>';
+    '<p class="card-meta">This category will be shared with all peoples of <b>' + esc(teamName || 'this team') + '</b>.</p>';
 
   openModal('Create Shared Category', bodyHtml, 'Create Category', function (form) {
     const name = String(form.get('name') || '').trim();
@@ -299,41 +299,41 @@ function openCreateSharedCategoryModal(teamId, teamName) {
   });
 }
 
-function openAddMemberModal(teamId) {
+function openAddpeopleModal(teamId) {
   const bodyHtml =
     '<div class="field">' +
-      '<label for="m_member_email">Teammate Email *</label>' +
-      '<input class="input" id="m_member_email" name="email" type="email" placeholder="colleague@example.com" required>' +
+    '<label for="m_people_email">Teammate Email *</label>' +
+    '<input class="input" id="m_people_email" name="email" type="email" placeholder="colleague@example.com" required>' +
     '</div>' +
     '<div class="field">' +
-      '<label for="m_member_role">Role</label>' +
-      '<select class="select" id="m_member_role" name="role">' +
-        '<option value="Member">Member (View & contribute)</option>' +
-        '<option value="Manager">Manager (Full team control)</option>' +
-      '</select>' +
+    '<label for="m_people_role">Role</label>' +
+    '<select class="select" id="m_people_role" name="role">' +
+    '<option value="people">people (View & contribute)</option>' +
+    '<option value="leader">leader (Full team control)</option>' +
+    '</select>' +
     '</div>';
 
-  openModal('Add Team Member', bodyHtml, 'Add Member', function (form) {
+  openModal('Add Team people', bodyHtml, 'Add people', function (form) {
     const email = String(form.get('email') || '').trim();
-    const role = String(form.get('role') || 'Member');
+    const role = String(form.get('role') || 'people');
     if (!email) { return 'Please enter an email address.'; }
 
-    fetch('/teams/' + teamId + '/members', {
+    fetch('/teams/' + teamId + '/peoples', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, role: role })
     }).then(function (res) {
       if (res.ok) {
-        toast('Member invited to team.');
+        toast('people invited to team.');
         closeModal();
         window.location.reload();
       } else {
         res.json().then(function (err) {
-          $('formError').textContent = err.error || 'Could not add member.';
+          $('formError').textContent = err.error || 'Could not add people.';
         });
       }
     }).catch(function () {
-      $('formError').textContent = 'Network error adding member.';
+      $('formError').textContent = 'Network error adding people.';
     });
   });
 }
@@ -386,31 +386,31 @@ function editUser(userId) {
 
       const bodyHtml =
         '<div class="field">' +
-          '<label for="eu_name">Name *</label>' +
-          '<input class="input" id="eu_name" name="name" value="' + esc(u.name) + '" required>' +
+        '<label for="eu_name">Name *</label>' +
+        '<input class="input" id="eu_name" name="name" value="' + esc(u.name) + '" required>' +
         '</div>' +
         '<div class="field">' +
-          '<label for="eu_email">Email</label>' +
-          '<input class="input" id="eu_email" name="email" value="' + esc(u.email) + '" readonly style="opacity:0.75;cursor:not-allowed;">' +
+        '<label for="eu_email">Email</label>' +
+        '<input class="input" id="eu_email" name="email" value="' + esc(u.email) + '" readonly style="opacity:0.75;cursor:not-allowed;">' +
         '</div>' +
         '<div class="field">' +
-          '<label for="eu_role">Role</label>' +
-          '<select class="select" id="eu_role" name="role">' +
-            '<option value="User"' + (u.role === 'User' ? ' selected' : '') + '>User</option>' +
-            '<option value="Admin"' + (u.role === 'Admin' ? ' selected' : '') + '>Admin</option>' +
-          '</select>' +
+        '<label for="eu_role">Role</label>' +
+        '<select class="select" id="eu_role" name="role">' +
+        '<option value="User"' + (u.role === 'User' ? ' selected' : '') + '>User</option>' +
+        '<option value="Admin"' + (u.role === 'Admin' ? ' selected' : '') + '>Admin</option>' +
+        '</select>' +
         '</div>' +
         '<div class="field">' +
-          '<label for="eu_status">Status</label>' +
-          '<select class="select" id="eu_status" name="status">' +
-            '<option value="Active"' + (u.status === 'Active' ? ' selected' : '') + '>Active</option>' +
-            '<option value="Disabled"' + (u.status === 'Disabled' ? ' selected' : '') + '>Disabled</option>' +
-          '</select>' +
+        '<label for="eu_status">Status</label>' +
+        '<select class="select" id="eu_status" name="status">' +
+        '<option value="Active"' + (u.status === 'Active' ? ' selected' : '') + '>Active</option>' +
+        '<option value="Disabled"' + (u.status === 'Disabled' ? ' selected' : '') + '>Disabled</option>' +
+        '</select>' +
         '</div>' +
         '<div class="field">' +
-          '<label for="eu_team">Team Assignment</label>' +
-          '<select class="select" id="eu_team" name="team">' + teamOptions + '</select>' +
-          '<span class="hint">Assign user as team member or None to clear.</span>' +
+        '<label for="eu_team">Team Assignment</label>' +
+        '<select class="select" id="eu_team" name="team">' + teamOptions + '</select>' +
+        '<span class="hint">Assign user as team people or None to clear.</span>' +
         '</div>';
 
       openModal('Edit User: ' + u.name, bodyHtml, 'Save Changes', function (form) {
@@ -477,27 +477,27 @@ function deleteUser(userId) {
   );
 }
 
-function removeTeamMember(teamId, memberId) {
+function removeTeampeople(teamId, peopleId) {
   confirmBox(
-    'Remove team member?',
-    'Are you sure you want to remove this member from the team?',
-    'Remove Member',
+    'Remove team people?',
+    'Are you sure you want to remove this people from the team?',
+    'Remove people',
     function () {
-      fetch('/teams/' + teamId + '/members/' + memberId + '/delete', {
+      fetch('/teams/' + teamId + '/peoples/' + peopleId + '/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       }).then(function (res) {
         if (res.ok) {
-          toast('Member removed.');
+          toast('people removed.');
           closeModal();
           window.location.reload();
         } else {
           res.json().then(function (err) {
-            toast(err.error || 'Could not remove member.', true);
+            toast(err.error || 'Could not remove people.', true);
           });
         }
       }).catch(function () {
-        toast('Network error removing member.', true);
+        toast('Network error removing people.', true);
       });
     }
   );
@@ -729,8 +729,8 @@ document.addEventListener('click', function (event) {
     return;
   }
 
-  if (action === 'addMember') {
-    openAddMemberModal(d.id);
+  if (action === 'addpeople') {
+    openAddpeopleModal(d.id);
     return;
   }
 
@@ -754,8 +754,8 @@ document.addEventListener('click', function (event) {
     return;
   }
 
-  if (action === 'removeMember') {
-    removeTeamMember(d.team, d.member);
+  if (action === 'removepeople') {
+    removeTeampeople(d.team, d.people);
     return;
   }
 
@@ -899,9 +899,9 @@ document.addEventListener('submit', function (event) {
             resBox.innerHTML =
               '<div style="margin-bottom:8px"><strong>Generated Short URL:</strong></div>' +
               '<div class="copy-row" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-                '<code id="landingShortOutput" style="font-weight:600;padding:6px 12px;background:rgba(255,255,255,0.08);border-radius:6px;">' + esc(data.short_url) + '</code>' +
-                '<button type="button" class="btn btn-sm btn-primary" data-action="copyLandingShort" data-url="' + esc(data.short_url) + '">Copy Short URL</button>' +
-                '<a href="' + esc(data.short_url) + '" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="text-decoration:none;">Open</a>' +
+              '<code id="landingShortOutput" style="font-weight:600;padding:6px 12px;background:rgba(255,255,255,0.08);border-radius:6px;">' + esc(data.short_url) + '</code>' +
+              '<button type="button" class="btn btn-sm btn-primary" data-action="copyLandingShort" data-url="' + esc(data.short_url) + '">Copy Short URL</button>' +
+              '<a href="' + esc(data.short_url) + '" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="text-decoration:none;">Open</a>' +
               '</div>';
           }
           toast('Short URL created!');
@@ -914,21 +914,21 @@ document.addEventListener('submit', function (event) {
   }
 });
 
-/* Team member role change listener */
+/* Team people role change listener */
 document.addEventListener('change', function (event) {
   const target = event.target;
   if (target && target.dataset.change === 'changeRole') {
     const teamId = target.dataset.team;
-    const memberId = target.dataset.member;
+    const peopleId = target.dataset.people;
     const newRole = target.value;
-    if (teamId && memberId) {
-      fetch('/teams/' + teamId + '/members/' + memberId + '/role', {
+    if (teamId && peopleId) {
+      fetch('/teams/' + teamId + '/peoples/' + peopleId + '/role', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: newRole })
       }).then(function (res) {
         if (res.ok) {
-          toast('Member role updated to ' + newRole + '.');
+          toast('people role updated to ' + newRole + '.');
         } else {
           res.json().then(function (err) { toast(err.error || 'Could not update role.', true); });
         }
