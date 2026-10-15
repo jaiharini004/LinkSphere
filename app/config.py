@@ -20,6 +20,9 @@ class Config:
         print("[LinkSphere] No Supabase DATABASE_URL configured. Falling back to local SQLite: sqlite:///linksphere.db")
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'connect_args': {'prepare_threshold': None}
+    } if ('pooler.supabase.com' in RAW_DATABASE_URL or ':6543' in RAW_DATABASE_URL) else {}
 
     # n8n Automation Webhooks
     N8N_INVITE_WEBHOOK_URL = os.getenv('N8N_INVITE_WEBHOOK_URL', '').strip()

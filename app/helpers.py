@@ -4,7 +4,7 @@ import string
 from datetime import datetime
 from functools import wraps
 from flask import session, request, redirect, url_for, jsonify
-from app.models import User, Link, Category, Team
+from app.models import User, Link, Category, Team, TeamMember
 
 def generate_short_code(length=6):
     """Generate a collision-free URL-safe short code."""
@@ -67,7 +67,20 @@ def compute_user_metrics(user):
     short_urls_count = sum(1 for l in active_links if bool(l.short_code))
 
     categories_count = Category.query.filter_by(user_id=user.id).count()
-    teams_count = Team.query.filter_by(manager_id=user.id).count()
+    try:
+        member_team_ids = [m.team_id for m in TeamMember.query.filter((TeamMember.user_id == user.id) | (TeamMember.email == user.email)).all()]
+        teams_count = Team.query.filter(
+            (Team.manager_id == user.id) | (Team.id.in_(member_team_ids))
+        ).distinct().count()
+    except Exception:
+        teams_count = Team.query.filter_by(manager_id=user.id).count()
+
+    try:
+        user_managed_teams = Team.query.filter_by(manager_id=user.id).all()
+        total_members_count = sum(t.members_count for t in user_managed_teams)
+    except Exception:
+        total_members_count = teams_count
+
     favourites_count = Link.query.filter(
         Link.user_id == user.id,
         Link.status.in_(['active', 'Active']),
@@ -88,6 +101,8 @@ def compute_user_metrics(user):
         'total_categories': categories_count,
         'teams': teams_count,
         'total_teams': teams_count,
+        'members': total_members_count,
+        'total_members': total_members_count,
         'shortUrls': short_urls_count,
         'short_urls': short_urls_count,
         'healthy': healthy_count,
@@ -98,6 +113,7 @@ def compute_user_metrics(user):
         'archived_count': archived_count,
         'deleted_count': deleted_count,
     }
+
 
 
 def compute_admin_metrics():

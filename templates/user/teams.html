@@ -45,24 +45,61 @@
           </tr>
         </thead>
         <tbody>
+          <!-- Manager row -->
           <tr>
             <td>
-              <b>{{ current_user.name }}</b>
+              <b>{{ active_team.owner.name if active_team.owner else 'Manager' }}</b>
+              {% if active_team.manager_id == current_user.id %}
               <span class="badge badge-active" style="font-size:10px;margin-left:6px;">You</span>
+              {% endif %}
             </td>
-            <td>{{ current_user.email }}</td>
-            <td>
-              <select class="select" style="width:auto;padding:4px 8px;font-size:13px;" data-change="changeRole" data-team="{{ active_team.id }}" data-user="{{ current_user.id }}" aria-label="Role">
-                <option value="Manager" selected>Manager</option>
-                <option value="Member">Member</option>
-              </select>
-            </td>
+            <td>{{ active_team.owner.email if active_team.owner else '-' }}</td>
+            <td><span class="badge badge-role">Manager</span></td>
             <td><span class="card-meta">Full team control</span></td>
             <td>
-              <button type="button" class="btn btn-sm btn-danger" data-action="deleteTeam" data-id="{{ active_team.id }}">Remove (Leave)</button>
+              {% if active_team.manager_id == current_user.id %}
+              <span class="card-meta">Team Creator</span>
+              {% else %}
+              <span class="card-meta">Manager</span>
+              {% endif %}
             </td>
           </tr>
+          <!-- Member rows -->
+          {% if active_team.members_list %}
+            {% for m in active_team.members_list %}
+              {% if m.user_id != active_team.manager_id and m.email != (active_team.owner.email if active_team.owner else '') %}
+              <tr>
+                <td>
+                  <b>{{ m.member_name }}</b>
+                  {% if current_user and (m.user_id == current_user.id or m.email == current_user.email) %}
+                  <span class="badge badge-active" style="font-size:10px;margin-left:6px;">You</span>
+                  {% endif %}
+                </td>
+                <td>{{ m.email }}</td>
+                <td>
+                  {% if is_manager or active_team.manager_id == current_user.id %}
+                  <select class="select" style="width:auto;padding:4px 8px;font-size:13px;" data-change="changeRole" data-team="{{ active_team.id }}" data-member="{{ m.id }}" aria-label="Role of {{ m.member_name }}">
+                    <option value="Manager" {% if m.role == 'Manager' %}selected{% endif %}>Manager</option>
+                    <option value="Member" {% if m.role == 'Member' %}selected{% endif %}>Member</option>
+                  </select>
+                  {% else %}
+                  <span class="badge badge-role">{{ m.role }}</span>
+                  {% endif %}
+                </td>
+                <td><span class="card-meta">{% if m.role == 'Manager' %}Full team control{% else %}Can view & contribute{% endif %}</span></td>
+                <td>
+                  {% if is_manager or active_team.manager_id == current_user.id or (current_user and (m.user_id == current_user.id or m.email == current_user.email)) %}
+                  <button type="button" class="btn btn-sm btn-danger" data-action="removeMember" data-team="{{ active_team.id }}" data-member="{{ m.id }}">Remove{% if current_user and (m.user_id == current_user.id or m.email == current_user.email) %} (Leave){% endif %}</button>
+                  {% else %}
+                  <span class="card-meta">Read-only</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
         </tbody>
+
       </table>
     </div>
   </section>
@@ -141,7 +178,7 @@
             <span>Manager: <b class="team-managers">{{ team.managers_label | default(team.manager_name | default('-')) }}</b></span>
           </div>
           <div class="card-actions" style="margin-top:auto;padding-top:10px;">
-            <button type="button" class="btn btn-sm btn-primary" data-action="viewTeam" data-id="{{ team.id }}">View Details</button>
+            <a href="{{ url_for('user.teams', team_id=team.id) }}" class="btn btn-sm btn-primary" data-action="viewTeam" data-id="{{ team.id }}" style="text-decoration:none;">View</a>
             <button type="button" class="btn btn-sm" data-action="addMember" data-id="{{ team.id }}">Add Member</button>
             <button type="button" class="btn btn-sm" data-action="editTeam" data-id="{{ team.id }}">Edit</button>
             <button type="button" class="btn btn-sm btn-danger" data-action="deleteTeam" data-id="{{ team.id }}">Delete</button>

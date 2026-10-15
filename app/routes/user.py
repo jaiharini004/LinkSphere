@@ -1,7 +1,8 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, abort, flash
 from app.extensions import db
-from app.models import Link, Category, Team, Folder
+from sqlalchemy import func
+from app.models import User, Link, Category, Team, Folder, TeamMember
 from app.helpers import (
     get_current_user,
     login_required,
@@ -669,18 +670,31 @@ def teams(team_id=None):
         except (ValueError, TypeError):
             pass
 
-    teams_list = Team.query.filter_by(manager_id=user.id).order_by(Team.created_at.desc()).all()
+    # Find all teams where user is manager or a member
+    member_team_ids = [m.team_id for m in TeamMember.query.filter((TeamMember.user_id == user.id) | (TeamMember.email == user.email)).all()]
+    teams_list = Team.query.filter(
+        (Team.manager_id == user.id) | (Team.id.in_(member_team_ids))
+    ).order_by(Team.created_at.desc()).all()
 
     active_team = None
     shared_categories = []
     shared_links = []
+    is_manager = False
 
     if team_id:
-        active_team = Team.query.filter_by(id=team_id, manager_id=user.id).first()
-        if not active_team and teams_list:
-            active_team = teams_list[0]
+        active_team = Team.query.filter(
+            (Team.id == team_id) & ((Team.manager_id == user.id) | (Team.id.in_(member_team_ids)))
+        ).first()
 
     if active_team:
+        is_manager = (active_team.manager_id == user.id)
+        if not is_manager:
+            user_mem = TeamMember.query.filter_by(team_id=active_team.id).filter(
+                (TeamMember.user_id == user.id) | (TeamMember.email == user.email)
+            ).first()
+            if user_mem and user_mem.role == 'Manager':
+                is_manager = True
+
         shared_categories = Category.query.filter_by(team_name=active_team.name).all()
         cat_ids = [c.id for c in shared_categories]
         if cat_ids:
@@ -693,6 +707,7 @@ def teams(team_id=None):
         'user/teams.html',
         teams=teams_list,
         active_team=active_team,
+        is_manager=is_manager,
         shared_categories=shared_categories,
         shared_links=shared_links,
         active_page='teams',
@@ -745,11 +760,34 @@ def add_team_member(team_id):
     team = Team.query.filter_by(id=team_id, manager_id=user.id).first_or_404()
 
     data = request.get_json(silent=True) or request.form
-    email = (data.get('email') or '').strip()
+    email = (data.get('email') or '').strip().lower()
     role = (data.get('role') or 'Member').strip()
 
     if not email:
         return jsonify({'error': 'Please provide an email address.'}), 400
+
+    # Check if target is manager
+    if team.owner and team.owner.email.lower() == email:
+        return jsonify({'error': 'User is already the manager of this team.'}), 400
+
+    # Check if already a member
+    existing = TeamMember.query.filter_by(team_id=team.id).filter(func.lower(TeamMember.email) == email).first()
+    if existing:
+        return jsonify({'error': f"'{email}' is already a member of this team."}), 400
+
+    # Check if registered user exists
+    reg_user = User.query.filter(func.lower(User.email) == email).first()
+    if reg_user and reg_user.is_admin:
+        return jsonify({'error': 'Platform administrators cannot be added as regular team members.'}), 400
+
+    member = TeamMember(
+        team_id=team.id,
+        user_id=reg_user.id if reg_user else None,
+        email=email,
+        role=role
+    )
+    db.session.add(member)
+    db.session.commit()
 
     from app.helpers import send_invitation_email
     webhook_sent = False
@@ -761,11 +799,49 @@ def add_team_member(team_id):
 
     return jsonify({
         'status': 'ok',
-        'message': f'Invitation sent to {email}',
+        'message': f'Added {email} to {team.name} as {role}',
         'email': email,
         'role': role,
+        'members_count': team.members_count,
         'webhook_sent': webhook_sent
     })
+
+
+@user_bp.route('/teams/<int:team_id>/members/<int:member_id>/delete', methods=['POST'])
+@login_required
+def remove_team_member(team_id, member_id):
+    user = get_current_user()
+    team = Team.query.get_or_404(team_id)
+    member = TeamMember.query.filter_by(id=member_id, team_id=team.id).first_or_404()
+
+    # Permission check: team manager OR the member themselves
+    is_manager = (team.manager_id == user.id)
+    is_self = (member.user_id == user.id or member.email.lower() == user.email.lower())
+
+    if not (is_manager or is_self):
+        return jsonify({'error': 'You do not have permission to remove this member.'}), 403
+
+    db.session.delete(member)
+    db.session.commit()
+    return jsonify({'status': 'ok', 'message': 'Member removed from team.', 'members_count': team.members_count})
+
+
+@user_bp.route('/teams/<int:team_id>/members/<int:member_id>/role', methods=['POST'])
+@login_required
+def change_team_member_role(team_id, member_id):
+    user = get_current_user()
+    team = Team.query.filter_by(id=team_id, manager_id=user.id).first_or_404()
+    member = TeamMember.query.filter_by(id=member_id, team_id=team.id).first_or_404()
+
+    data = request.get_json(silent=True) or request.form
+    new_role = (data.get('role') or 'Member').strip()
+    if new_role not in ['Manager', 'Member']:
+        return jsonify({'error': 'Invalid role.'}), 400
+
+    member.role = new_role
+    db.session.commit()
+    return jsonify({'status': 'ok', 'role': member.role})
+
 
 
 @user_bp.route('/settings')

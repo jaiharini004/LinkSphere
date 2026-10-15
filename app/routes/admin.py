@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash
 from app.extensions import db
-from app.models import User, Team, Category, Link
+from app.models import User, Team, Category, Link, TeamMember
 from app.helpers import admin_required, compute_admin_metrics, get_current_user
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -24,16 +24,18 @@ def admin_users():
     query = User.query
 
     if filter_type == 'active':
-        query = query.filter_by(is_active=True)
+        query = query.filter(User.status_str.ilike('active'))
     elif filter_type == 'disabled':
-        query = query.filter_by(is_active=False)
+        query = query.filter(User.status_str.ilike('disabled'))
     elif filter_type == 'admins':
-        query = query.filter_by(is_admin=True)
+        query = query.filter(User.role_str.ilike('admin'))
 
     users = query.order_by(User.created_at.desc()).all()
-    active_count = User.query.filter_by(is_active=True).count()
-    disabled_count = User.query.filter_by(is_active=False).count()
-    admin_count = User.query.filter_by(is_admin=True).count()
+    active_count = User.query.filter(User.status_str.ilike('active')).count()
+    disabled_count = User.query.filter(User.status_str.ilike('disabled')).count()
+    admin_count = User.query.filter(User.role_str.ilike('admin')).count()
+
+    all_teams = Team.query.order_by(Team.name.asc()).all()
 
     return render_template(
         'admin/users.html',
@@ -41,9 +43,118 @@ def admin_users():
         active_count=active_count,
         disabled_count=disabled_count,
         admin_count=admin_count,
+        teams=all_teams,
         is_admin=True,
         active_page='adminUsers',
     )
+
+
+@admin_bp.route('/users/<int:user_id>', methods=['GET'])
+@admin_required
+def admin_get_user(user_id):
+    u = User.query.get_or_404(user_id)
+    user_team_ids = [m.team_id for m in TeamMember.query.filter((TeamMember.user_id == u.id) | (TeamMember.email == u.email)).all()]
+    manager_teams = [t.id for t in Team.query.filter_by(manager_id=u.id).all()]
+    all_user_team_ids = list(set(user_team_ids + manager_teams))
+
+    all_teams = [{'id': t.id, 'name': t.name} for t in Team.query.order_by(Team.name.asc()).all()]
+
+    return jsonify({
+        'id': u.id,
+        'name': u.name,
+        'email': u.email,
+        'role': u.role,
+        'status': u.status,
+        'teams_label': u.teams_label,
+        'team_id': all_user_team_ids[0] if all_user_team_ids else None,
+        'available_teams': all_teams
+    })
+
+
+@admin_bp.route('/users/<int:user_id>/edit', methods=['POST'])
+@admin_required
+def admin_edit_user(user_id):
+    current_admin = get_current_user()
+    target_user = User.query.get_or_404(user_id)
+
+    data = request.get_json(silent=True) or request.form
+    name = (data.get('name') or '').strip()
+    role = (data.get('role') or target_user.role).strip()
+    status = (data.get('status') or target_user.status).strip()
+    team_id = data.get('team')
+
+    if not name:
+        return jsonify({'error': 'Name is required.'}), 400
+
+    if target_user.id == current_admin.id and role.lower() != 'admin':
+        return jsonify({'error': 'You cannot revoke your own administrator privileges.'}), 400
+
+    target_user.name = name
+    target_user.role_str = 'admin' if role.lower() == 'admin' else 'user'
+    target_user.status_str = 'Active' if status.lower() == 'active' else 'Disabled'
+
+    # Team assignment if provided
+    if team_id is not None:
+        team_id_str = str(team_id).strip()
+        if team_id_str == '' or team_id_str == 'none':
+            TeamMember.query.filter((TeamMember.user_id == target_user.id) | (TeamMember.email == target_user.email)).delete()
+        else:
+            try:
+                t_id = int(team_id_str)
+                team = Team.query.get(t_id)
+                if team and team.manager_id != target_user.id:
+                    existing = TeamMember.query.filter_by(team_id=t_id).filter(
+                        (TeamMember.user_id == target_user.id) | (TeamMember.email == target_user.email)
+                    ).first()
+                    if not existing:
+                        db.session.add(TeamMember(
+                            team_id=t_id,
+                            user_id=target_user.id,
+                            email=target_user.email,
+                            role='Member'
+                        ))
+            except (ValueError, TypeError):
+                pass
+
+    db.session.commit()
+    return jsonify({
+        'status': 'ok',
+        'message': f'User "{target_user.name}" updated successfully.',
+        'user': {
+            'id': target_user.id,
+            'name': target_user.name,
+            'role': target_user.role,
+            'status': target_user.status,
+            'teams_label': target_user.teams_label,
+        }
+    })
+
+
+@admin_bp.route('/users/<int:user_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_user(user_id):
+    current_admin = get_current_user()
+    target_user = User.query.get_or_404(user_id)
+
+    if target_user.id == current_admin.id:
+        error_msg = "You cannot delete your own administrator account."
+        if request.is_json:
+            return jsonify({'error': error_msg}), 400
+        flash(error_msg, 'error')
+        return redirect(url_for('admin.admin_users'))
+
+    deleted_name = target_user.name
+
+    # Remove user from any team memberships
+    TeamMember.query.filter((TeamMember.user_id == target_user.id) | (TeamMember.email == target_user.email)).delete()
+
+    db.session.delete(target_user)
+    db.session.commit()
+
+    if request.is_json:
+        return jsonify({'status': 'ok', 'message': f'User "{deleted_name}" deleted.'})
+    flash(f'User "{deleted_name}" deleted.', 'success')
+    return redirect(url_for('admin.admin_users'))
 
 
 @admin_bp.route('/users/<int:user_id>/toggle-status', methods=['POST'])
