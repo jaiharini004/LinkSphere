@@ -686,9 +686,6 @@ def teams(team_id=None):
             (Team.id == team_id) & ((Team.manager_id == user.id) | (Team.id.in_(member_team_ids)))
         ).first()
 
-    if not active_team and teams_list:
-        active_team = teams_list[0]
-
     if active_team:
         is_manager = (active_team.manager_id == user.id)
         if not is_manager:

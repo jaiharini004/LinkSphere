@@ -1148,7 +1148,7 @@ function pageTeams() {
         '<span>Manager: <b class="team-managers">' + esc(managers) + '</b></span>' +
       '</div>' +
       '<div class="card-actions" style="margin-top:auto;padding-top:10px">' +
-        '<button type="button" class="btn btn-sm btn-primary" data-action="viewTeam" data-id="' + t.id + '">View Details</button>' +
+        '<button type="button" class="btn btn-sm btn-primary" data-action="viewTeam" data-id="' + t.id + '">View</button>' +
         (isManager ? '<button type="button" class="btn btn-sm" data-action="addMember" data-id="' + t.id + '">Add Member</button>' : '') +
         menuHtml('team' + t.id, items) +
       '</div>' +

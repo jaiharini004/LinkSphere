@@ -178,7 +178,7 @@
             <span>Manager: <b class="team-managers">{{ team.managers_label | default(team.manager_name | default('-')) }}</b></span>
           </div>
           <div class="card-actions" style="margin-top:auto;padding-top:10px;">
-            <button type="button" class="btn btn-sm btn-primary" data-action="viewTeam" data-id="{{ team.id }}">View Details</button>
+            <a href="{{ url_for('user.teams', team_id=team.id) }}" class="btn btn-sm btn-primary" data-action="viewTeam" data-id="{{ team.id }}" style="text-decoration:none;">View</a>
             <button type="button" class="btn btn-sm" data-action="addMember" data-id="{{ team.id }}">Add Member</button>
             <button type="button" class="btn btn-sm" data-action="editTeam" data-id="{{ team.id }}">Edit</button>
             <button type="button" class="btn btn-sm btn-danger" data-action="deleteTeam" data-id="{{ team.id }}">Delete</button>
