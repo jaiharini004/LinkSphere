@@ -13,7 +13,6 @@ class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {}
     SECRET_KEY = 'test-secret-key'
 
 test_app = create_app(TestConfig)

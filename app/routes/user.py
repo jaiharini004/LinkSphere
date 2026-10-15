@@ -135,25 +135,34 @@ def new_link():
             tags_str = str(raw_tags).strip()
 
         cat_id = None
-        category_name = (data.get('category_name') or '').strip()
         if category_id:
             try:
                 cat = Category.query.filter_by(id=int(category_id)).first()
                 if cat:
-                    member_team_ids = [m.team_id for m in TeamMember.query.filter((TeamMember.user_id == user.id) | (TeamMember.email == user.email)).all()]
-                    user_teams = Team.query.filter((Team.leader_id == user.id) | (Team.id.in_(member_team_ids))).all()
-                    allowed_team_names = [t.name for t in user_teams]
-                    if cat.user_id == user.id or (cat.team_name and cat.team_name in allowed_team_names):
+                    teams_as_leader = Team.query.filter_by(leader_id=user.id).all()
+                    teams_as_people = Team.query.join(Teampeople, Teampeople.team_id == Team.id).filter(
+                        (Teampeople.user_id == user.id) | (Teampeople.email == user.email)
+                    ).all()
+                    allowed_teams = {t.name for t in (teams_as_leader + teams_as_people)}
+                    if cat.user_id == user.id or cat.team_name in allowed_teams:
                         cat_id = cat.id
             except (ValueError, TypeError):
                 pass
-        elif category_name:
-            cat = Category.query.filter_by(user_id=user.id, name=category_name).first()
-            if not cat:
-                cat = Category(name=category_name, user_id=user.id)
-                db.session.add(cat)
+
+        new_cat_name = (data.get('category_name') or data.get('new_category_name') or '').strip()
+        if not cat_id and new_cat_name:
+            existing = Category.query.filter(
+                Category.user_id == user.id,
+                Category.name == new_cat_name,
+                (Category.team_name.is_(None)) | (Category.team_name == '')
+            ).first()
+            if existing:
+                cat_id = existing.id
+            else:
+                new_cat = Category(name=new_cat_name, user_id=user.id)
+                db.session.add(new_cat)
                 db.session.commit()
-            cat_id = cat.id
+                cat_id = new_cat.id
 
         fld_id = None
         if folder_id:
@@ -234,8 +243,19 @@ def edit_link(link_id):
 
         if category_id:
             try:
-                cat = Category.query.filter_by(id=int(category_id), user_id=user.id).first()
-                link.category_id = cat.id if cat else None
+                cat = Category.query.filter_by(id=int(category_id)).first()
+                if cat:
+                    teams_as_leader = Team.query.filter_by(leader_id=user.id).all()
+                    teams_as_people = Team.query.join(Teampeople, Teampeople.team_id == Team.id).filter(
+                        (Teampeople.user_id == user.id) | (Teampeople.email == user.email)
+                    ).all()
+                    allowed_teams = {t.name for t in (teams_as_leader + teams_as_people)}
+                    if cat.user_id == user.id or cat.team_name in allowed_teams:
+                        link.category_id = cat.id
+                    else:
+                        link.category_id = None
+                else:
+                    link.category_id = None
             except (ValueError, TypeError):
                 link.category_id = None
         else:
@@ -454,41 +474,34 @@ def trash():
     )
 
 
-@user_bp.route('/api/categories', methods=['GET'])
-@login_required
-def api_categories():
-    user = get_current_user()
-    if not user:
-        return jsonify({'categories': []}), 401
-
-    personal = Category.query.filter(
+def get_user_categories_data(user):
+    personal_categories = Category.query.filter(
         Category.user_id == user.id,
         (Category.team_name.is_(None)) | (Category.team_name == '')
     ).order_by(Category.name.asc()).all()
 
-    member_team_ids = [m.team_id for m in TeamMember.query.filter(
-        (TeamMember.user_id == user.id) | (TeamMember.email == user.email)
-    ).all()]
-    user_teams = Team.query.filter(
-        (Team.leader_id == user.id) | (Team.id.in_(member_team_ids))
+    teams_as_leader = Team.query.filter_by(leader_id=user.id).all()
+    teams_as_people = Team.query.join(Teampeople, Teampeople.team_id == Team.id).filter(
+        (Teampeople.user_id == user.id) | (Teampeople.email == user.email)
     ).all()
-    user_team_names = [t.name for t in user_teams]
-    shared = Category.query.filter(
+    all_user_teams = list({t.id: t for t in (teams_as_leader + teams_as_people)}.values())
+    user_team_names = [t.name for t in all_user_teams]
+
+    shared_categories = Category.query.filter(
         Category.team_name.in_(user_team_names)
     ).order_by(Category.name.asc()).all() if user_team_names else []
 
-    all_cats = []
-    seen = set()
-    for c in personal:
-        if c.id not in seen:
-            seen.add(c.id)
-            all_cats.append({'id': c.id, 'name': c.name, 'team_name': None, 'type': 'personal'})
-    for c in shared:
-        if c.id not in seen:
-            seen.add(c.id)
-            all_cats.append({'id': c.id, 'name': c.name, 'team_name': c.team_name, 'type': 'shared'})
+    return {
+        'personal': [{'id': c.id, 'name': c.name} for c in personal_categories],
+        'shared': [{'id': c.id, 'name': c.name, 'team_name': c.team_name} for c in shared_categories]
+    }
 
-    return jsonify({'categories': all_cats})
+
+@user_bp.route('/api/categories', methods=['GET'])
+@login_required
+def api_categories():
+    user = get_current_user()
+    return jsonify(get_user_categories_data(user))
 
 
 @user_bp.route('/categories', methods=['GET', 'POST'], defaults={'category_id': None})
@@ -496,8 +509,8 @@ def api_categories():
 @login_required
 def categories(category_id=None):
     user = get_current_user()
-    if request.method == 'GET' and not category_id and (request.is_json or request.headers.get('Accept') == 'application/json' or request.args.get('format') == 'json'):
-        return api_categories()
+    if request.method == 'GET' and (request.args.get('format') == 'json' or request.headers.get('Accept') == 'application/json' or request.is_json):
+        return jsonify(get_user_categories_data(user))
 
     if request.method == 'POST':
         data = request.get_json(silent=True) or request.form
@@ -511,10 +524,18 @@ def categories(category_id=None):
             flash(error_msg, 'error')
             return redirect(url_for('user.categories'))
 
-        existing = Category.query.filter_by(user_id=user.id, name=name).first()
+        if team_name:
+            existing = Category.query.filter_by(name=name, team_name=team_name).first()
+        else:
+            existing = Category.query.filter(
+                Category.user_id == user.id,
+                Category.name == name,
+                (Category.team_name.is_(None)) | (Category.team_name == '')
+            ).first()
+
         if existing:
             if request.is_json:
-                return jsonify({'status': 'ok', 'id': existing.id, 'name': existing.name, 'team_name': existing.team_name, 'existing': True})
+                return jsonify({'status': 'ok', 'id': existing.id, 'name': existing.name, 'team_name': existing.team_name})
             error_msg = 'A category with this name already exists.'
             flash(error_msg, 'error')
             return redirect(url_for('user.categories'))
